@@ -1,0 +1,19 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* html과 body를 화면 전체 크기로 설정 */
+
+}
+#root {
+  width: 100%;
+  height: 100%; /* React 앱의 루트 요소도 전체 크기로 설정 */
+  background-color: #1F1F1F; /* 페이지 전체 배경색 설정 */
+}
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #1f1f1f;
+  color: white;
+}

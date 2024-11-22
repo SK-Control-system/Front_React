@@ -1,0 +1,53 @@
+.viewer-category-stats {
+  width: 100%;
+  background: #303030;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  max-width: 1000px;
+  margin: 0 auto; /* 가운데 정렬 */
+
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr 3fr 3fr 1fr;
+  color: #ffffff;
+  font-family: "NanumSquare Neo OTF", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3b3b3b;
+  margin-bottom: 10px;
+}
+
+.category-row {
+  display: grid;
+  grid-template-columns: 1fr 3fr 3fr 1fr;
+  align-items: center;
+  padding: 8px 0;
+  color: #ffffff;
+  font-family: "NanumSquare Neo OTF", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.rank {
+  text-align: center;
+  color: #7c8db5;
+}
+
+
+
+.progress-bar {
+  position: relative;
+  height: 12px;
+  background: #474747;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  border-radius: 6px;
+}
