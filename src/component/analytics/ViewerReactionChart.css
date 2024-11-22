@@ -1,0 +1,35 @@
+.emotion-statistics-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  gap: 20px;
+}
+
+.emotion-statistics {
+  position: relative;
+  width: 379px;
+  height: 406px;
+  background: #303030;
+  border: 1px solid #3B3B3B;
+  border-radius: 12px;
+  padding: 20px;
+  color: #FFFFFF;
+}
+
+.emotion-title {
+  font-family: 'NanumSquare Neo OTF', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 42px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  width: 215px;
+  height: 215px;
+  margin: 0 auto;
+  position: relative;
+}

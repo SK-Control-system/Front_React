@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavbarComponent from "./component/NavbarComponent";
 import MainPage from "./component/page/MainPage";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import AnalyticsPage from "./component/page/AnalyticsPage";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-
 
 function App() {
   const stats = {
@@ -14,7 +14,6 @@ function App() {
     totalComments: 23184,
   };
 
-  
   const viewerData = [
     { time: "15:00", viewers: 10 },
     { time: "18:00", viewers: 25 },
@@ -32,6 +31,7 @@ function App() {
     { name: "정치", percentage: 18, color: "#FF43E3" },
     { name: "버추얼", percentage: 17, color: "#FFA344" },
   ];
+
   const rankings = [
     {
       name: "봉준",
@@ -58,7 +58,7 @@ function App() {
       color: "#FFC0CB",
     },
   ];
-  
+
 
   return (
     <Router>
@@ -68,8 +68,7 @@ function App() {
           path="/"
           element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
         />
-        {/* <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} /> */}
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </Routes>
     </Router>
   );

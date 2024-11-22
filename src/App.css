@@ -11,9 +11,19 @@ html, body {
   background-color: #1F1F1F; /* 페이지 전체 배경색 설정 */
 }
 .main-container {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   background-color: #1f1f1f;
   color: white;
+}
+
+.analytics-container{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #1f1f1f;
+  color: white;
+
 }
