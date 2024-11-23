@@ -124,16 +124,12 @@ const ViewerReactionChart = ({ data }) => {
       {/* 시청자 금/부정 통계 */}
       <div className="emotion-statistics">
         <h3 className="emotion-title">시청자의 긍/부정 통계</h3>
-        <div className="chart-container">
           <Doughnut data={doughnutData} options={doughnutOptions} />
-        </div>
       </div>
       {/* 시청자 감성 통계 */}
       <div className="emotion-statistics">
         <h3 className="emotion-title">시청자의 감성 통계</h3>
-        <div className="chart-container">
           <PolarArea data={polarAreaData} options={polarAreaOptions} />
-        </div>
       </div>
     </div>
   );
