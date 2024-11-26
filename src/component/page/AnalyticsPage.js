@@ -61,7 +61,7 @@ const AnalyticsPage = () => {
     <div className="analytics-container">
       <EmotionTrendChart data={emotionData} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="tab-content">{renderContent()}</div>
+      {/* <div className="tab-content">{renderContent()}</div> */}
     </div>
   );
 };

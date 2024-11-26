@@ -12,13 +12,21 @@ import "./ViewerReactionChart.css";
 // Chart.js에 필요한 모듈 등록
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale);
 
-const ViewerReactionChart = ({ data }) => {
+const ViewerReactionChart = () => {
   const [emotionStats, setEmotionStats] = useState({
     joy: 0.25,
     sadness: 0.23,
     anger: 0.15,
     disgust: 0.13,
     surprise: 0.11,
+  });
+
+  const [doughnutStats, setDoughnutStats] = useState({
+    veryPositive: 0.3,
+    positive: 0.5,
+    neutral: 0.2,
+    negative: 0.15,
+    veryNegative: 0.1,
   });
 
   // 감성 통계 랜덤 업데이트
@@ -30,6 +38,14 @@ const ViewerReactionChart = ({ data }) => {
         anger: Math.random().toFixed(2),
         disgust: Math.random().toFixed(2),
         surprise: Math.random().toFixed(2),
+      });
+
+      setDoughnutStats({
+        veryPositive: Math.random().toFixed(2),
+        positive: Math.random().toFixed(2),
+        neutral: Math.random().toFixed(2),
+        negative: Math.random().toFixed(2),
+        veryNegative: Math.random().toFixed(2),
       });
     };
 
@@ -43,11 +59,11 @@ const ViewerReactionChart = ({ data }) => {
     datasets: [
       {
         data: [
-          data.veryPositive,
-          data.positive,
-          data.neutral,
-          data.negative,
-          data.veryNegative,
+          doughnutStats.veryPositive,
+          doughnutStats.positive,
+          doughnutStats.neutral,
+          doughnutStats.negative,
+          doughnutStats.veryNegative,
         ],
         backgroundColor: [
           "#22C55E", // Green
@@ -121,15 +137,15 @@ const ViewerReactionChart = ({ data }) => {
 
   return (
     <div className="emotion-statistics-container">
-      {/* 시청자 금/부정 통계 */}
+      {/* 시청자 긍/부정 통계 */}
       <div className="emotion-statistics">
         <h3 className="emotion-title">시청자의 긍/부정 통계</h3>
-          <Doughnut data={doughnutData} options={doughnutOptions} />
+        <Doughnut data={doughnutData} options={doughnutOptions} />
       </div>
       {/* 시청자 감성 통계 */}
       <div className="emotion-statistics">
         <h3 className="emotion-title">시청자의 감성 통계</h3>
-          <PolarArea data={polarAreaData} options={polarAreaOptions} />
+        <PolarArea data={polarAreaData} options={polarAreaOptions} />
       </div>
     </div>
   );

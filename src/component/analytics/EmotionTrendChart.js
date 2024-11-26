@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
 import "../analytics/EmotionTrendChart.css";
 import "../../App.css";
@@ -24,8 +24,20 @@ ChartJS.register(
 );
 
 const EmotionTrendChart = ({ data }) => {
-  const chartData = {
-    labels: data.map((item) => item.time), // x축: 시간
+  const [selectedChart, setSelectedChart] = useState("emotionTrend"); // 기본값: 감정 트렌드
+  const [dropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 열림 상태
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev); // 드롭다운 열림/닫힘 토글
+  };
+
+  const handleChartChange = (chart) => {
+    setSelectedChart(chart); // 선택한 차트로 변경
+    setDropdownOpen(false); // 드롭다운 닫기
+  };
+
+  const emotionTrendData = {
+    labels: data.map((item) => item.time),
     datasets: [
       {
         label: "매우 긍정",
@@ -33,8 +45,8 @@ const EmotionTrendChart = ({ data }) => {
         borderColor: "#2E7D32",
         backgroundColor: "rgba(46, 125, 50, 0.2)",
         borderWidth: 2,
-        tension: 0.4, //그래프줄의 텐션
-        pointRadius: 0, //포인트점안보이게
+        tension: 0.4,
+        pointRadius: 0,
       },
       {
         label: "긍정",
@@ -75,12 +87,27 @@ const EmotionTrendChart = ({ data }) => {
     ],
   };
 
+  const dummyChartData = {
+    labels: data.map((item) => item.time),
+    datasets: [
+      {
+        label: "실시간 시청자 수",
+        data: data.map((item) => Math.random() * 100), // 더미 데이터
+        borderColor: "#FF5733",
+        backgroundColor: "rgba(255, 87, 51, 0.2)",
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 0,
+      },
+    ],
+  };
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     animation: {
-      duration: 800, // 애니메이션 시간 (ms)
-      easing: "easeInOutQuad", // 애니메이션 곡선
+      duration: 800,
+      easing: "easeInOutQuad",
     },
     plugins: {
       legend: {
@@ -103,11 +130,36 @@ const EmotionTrendChart = ({ data }) => {
   };
 
   return (
-    // <div className="chart-container">
-    <div className="adfasfsd">
-      <Line data={chartData} options={options} />
+    <div className="chart-container">
+      <div className="chart-header">
+        <div className="filter">
+          <span onClick={toggleDropdown}>
+            {selectedChart === "emotionTrend" ? "감정 트렌드 ▼" : "시청자 수 ▼"}
+          </span>
+          <div className={`dropdown ${dropdownOpen ? "open" : ""}`}>
+            <div
+              className="dropdown-item"
+              onClick={() => handleChartChange("emotionTrend")}
+            >
+              <span className="dropdown-icon"></span> 감정 트렌드
+            </div>
+            <div
+              className="dropdown-item"
+              onClick={() => handleChartChange("dummyChart")}
+            >
+              <span className="dropdown-icon"></span>시청자 수 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="chart">
+      <Line
+        data={selectedChart === "emotionTrend" ? emotionTrendData : dummyChartData}
+        options={options}
+      />
+      </div>
     </div>
   );
-};
+}
 
 export default EmotionTrendChart;
