@@ -1,0 +1,31 @@
+.likes-comments-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #303030;
+  border: 1px solid #3b3b3b;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+
+  
+}
+
+.section-title {
+  font-family: "NanumSquare Neo OTF", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  width: 1000%;
+  max-width: 800px;
+  height: 300px; /* 고정 높이 설정 */
+}
+
+.chart-wrapper canvas {
+  border-radius: 8px;
+}

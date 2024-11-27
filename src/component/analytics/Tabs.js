@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "./Tabs.css"; // 위에서 정의한 CSS를 여기에 작성
-import ViewerReactionChart from "./ViewerReactionChart"; // ViewerReactionChart 컴포넌트를 가져옴
-
-// 탭에 따라 보여줄 컴포넌트들
+import "./Tabs.css"; // CSS 파일
+import ViewerReactionChart from "./ViewerReactionChart"; // ViewerReactionChart 컴포넌트
+import WordCloudComponent from "./WordCloudComponent"; // WordCloud 컴포넌트
+import LikesAndComments from "./LikesAndComments";
 const ViewerReaction = () => {
   const mockData = {
     veryPositive: 30,
@@ -10,26 +10,24 @@ const ViewerReaction = () => {
     neutral: 20,
     negative: 15,
     veryNegative: 10,
-  }; // 더미 데이터
+  };
 
   return <ViewerReactionChart data={mockData} />;
 };
-// 탭에 따라 보여줄 컴포넌트들
-// const ViewerReaction = () => <div>시청자 반응 내용</div>;
-const KeywordStats = () => <div>키워드 내용</div>;
-const LikesAndComments = () => <div>좋아요 & 댓글 내용</div>;
+
+
+// 탭 내용에 표시될 컴포넌트들
 
 const Tabs = () => {
-  // 활성화된 탭 상태 관리
   const [activeTab, setActiveTab] = useState("viewerReaction");
 
-  // 탭 내용 렌더링
+  // 탭에 따른 콘텐츠 렌더링
   const renderContent = () => {
     switch (activeTab) {
       case "viewerReaction":
         return <ViewerReaction />;
       case "keywordStats":
-        return <KeywordStats />;
+        return <WordCloudComponent />; // WordCloud 컴포넌트 연결
       case "likesAndComments":
         return <LikesAndComments />;
       default:

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Tabs from "../analytics/Tabs";
-import ViewerReactionChart from "../analytics/ViewerReactionChart";
 import EmotionTrendChart from "../analytics/EmotionTrendChart";
+import ChatBox from "../analytics/ChatBox";
+
 const AnalyticsPage = () => {
   const [emotionData, setEmotionData] = useState([]);
   const [activeTab, setActiveTab] = useState("viewerReaction");
@@ -34,34 +35,18 @@ const AnalyticsPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "viewerReaction":
-        return (
-          <ViewerReactionChart
-            data={emotionData[emotionData.length - 1] || {
-              veryPositive: 0,
-              positive: 0,
-              neutral: 0,
-              negative: 0,
-              veryNegative: 0,
-            }}
-          />
-        );
-      case "keywordStats":
-        return <div>키워드 관련 내용</div>;
-      case "likesAndComments":
-        return <div>좋아요 & 댓글 내용</div>;
-      default:
-        return null;
-    }
-  };
+//   <div className="좌측">
+//   {/* <ChatBox/> */}
+// </div>
+// <div className="우측">
+//   <EmotionTrendChart data={emotionData} />
+//   <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+// </div>
 
   return (
     <div className="analytics-container">
-      <EmotionTrendChart data={emotionData} />
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      {/* <div className="tab-content">{renderContent()}</div> */}
+        <EmotionTrendChart data={emotionData} />
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 };

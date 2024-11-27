@@ -5,7 +5,7 @@
   padding: 20px;
   gap: 24px;
   width: 100%; /* 화면 크기에 맞게 조정 */
-  max-width: 1000px; /* 최대 크기 제한 */
+  max-width: 800px; /* 최대 크기 제한 */
   height: 400px;
   background: #303030;
   border: 1px solid #3B3B3B;

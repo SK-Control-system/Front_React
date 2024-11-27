@@ -1,0 +1,13 @@
+.wordcloud-container {
+  width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+  max-width: 900px; /* 최대 너비를 설정 */
+  height: 400px; /* 고정 높이 */
+  margin: 0 auto; /* 가운데 정렬 */
+  position: relative; /* 상대적 위치 설정 */
+}
+
+.wordcloud-canvas {
+  width: 100%; /* 부모 컨테이너에 맞게 캔버스 너비를 설정 */
+  height: 100%; /* 부모 컨테이너에 맞게 캔버스 높이를 설정 */
+  display: block; /* 캔버스의 불필요한 여백 제거 */
+}
