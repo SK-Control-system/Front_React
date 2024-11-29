@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavbarComponent from "./component/NavbarComponent";
 import MainPage from "./component/page/MainPage";
 import AnalyticsPage from "./component/page/AnalyticsPage";
+import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
@@ -73,6 +74,7 @@ function App() {
           path="/livebroadcast"
           element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
         />
+         <Route path="/channel" element={<ChannelAnalyticsPage />} />
       </Routes>
     </Router>
   );
