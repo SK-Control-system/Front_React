@@ -5,7 +5,7 @@ import MainPage from "./component/page/MainPage";
 import AnalyticsPage from "./component/page/AnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-
+import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
 function App() {
   const stats = {
     totalViewers: 72131,
@@ -69,6 +69,10 @@ function App() {
           element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
         />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route
+          path="/livebroadcast"
+          element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
+        />
       </Routes>
     </Router>
   );

@@ -45,8 +45,13 @@ const AnalyticsPage = () => {
 
   return (
     <div className="analytics-container">
+      <div className="좌측">
+          <ChatBox/>
+      </div>
+      <div className="우측">
         <EmotionTrendChart data={emotionData} />
         <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
     </div>
   );
 };

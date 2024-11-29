@@ -22,7 +22,15 @@ html, body {
 .analytics-container{
   margin-top: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background-color: #1f1f1f;
   color: white;
+}
+
+.좌측{
+  width: 25%;
+}
+
+.우측{
+  width: 75%;
 }

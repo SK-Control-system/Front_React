@@ -1,0 +1,144 @@
+/* 유튜브 로고 */
+.live-broadcast-youtube-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  position: relative;
+}
+
+.youtube-red-background {
+  background: #ee3535;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.youtube-white-play {
+  width: 6px;
+  height: 6px;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  background: #ffffff;
+}
+
+/* 채널명과 유튜브 로고 그룹 */
+.live-broadcast-channel-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* LiveBroadcastPage 스타일 */
+.live-broadcast-page {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 20px;
+  font-family: 'NanumSquare Neo', sans-serif;
+}
+
+/* 카테고리 섹션 스타일 */
+.live-broadcast-category-section {
+  margin-bottom: 40px;
+}
+
+.live-broadcast-category-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.live-broadcast-list {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+}
+
+/* 카드 스타일 */
+.live-broadcast-card {
+  width: 320px;
+  height: 311px;
+  background: linear-gradient(
+      158.47deg,
+      rgba(255, 0, 0, 0.23) 36.65%,
+      rgba(0, 0, 0, 0.23) 85.85%
+    ),
+    #303030;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+  border-radius: 16px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.live-broadcast-card-media {
+  position: absolute;
+  width: 320px;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.live-broadcast-card-info {
+  position: absolute;
+  width: 294px;
+  height: 111px;
+  left: 13px;
+  top: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.live-broadcast-card-name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #9a9a9a;
+}
+
+.live-broadcast-channel-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.live-broadcast-category {
+  font-weight: 400;
+  font-size: 14px;
+  color: #9a9a9a;
+}
+
+.live-broadcast-card-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-broadcast-channel-profile {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+
+.live-broadcast-card-title {
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 22px;
+  color: #ffffff;
+}
+
+.live-broadcast-card-footer {
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+}
