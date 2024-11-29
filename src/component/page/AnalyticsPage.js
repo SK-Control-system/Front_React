@@ -24,7 +24,7 @@ const AnalyticsPage = () => {
     }
 
     // SSE 연결 시작
-    eventSourceRef.current = new EventSource(`${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId ? videoId : '_L_kjyJkgwk'}`);
+    eventSourceRef.current = new EventSource(`${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId}`); // videoId ? videoId : '_L_kjyJkgwk'
 
     eventSourceRef.current.onmessage = (event) => {
       try {
