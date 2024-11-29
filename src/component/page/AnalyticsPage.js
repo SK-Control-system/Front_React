@@ -43,18 +43,21 @@ const AnalyticsPage = () => {
         // 긍부정 데이터 업데이트
         const { sentiment } = newChat.items[0];
         setEmotionData((prevData) => {
-          const time = new Date().toLocaleTimeString(); // 현재 시간을 가져옴
+          const time = new Date().toLocaleTimeString();
+          
+          // 새로운 감정 데이터를 기반으로 업데이트
           const newEmotion = {
             time,
-            ...prevData.reduce((acc, emotion) => {
-              acc[emotion.label] = acc[emotion.label] || 0; // 초기값 설정
-              if (emotion.label === sentiment.label) {
-                acc[emotion.label] += 1; // 같은 감정 카운트 증가
-              }
-              return acc;
-            }, {}),
+            veryPositive: sentiment.label === "매우 긍정" ? 1 : 0,
+            positive: sentiment.label === "긍정" ? 1 : 0,
+            neutral: sentiment.label === "중립" ? 1 : 0,
+            negative: sentiment.label === "부정" ? 1 : 0,
+            veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
           };
-          return [...prevData.slice(-9), newEmotion]; // 최신 10개 데이터 유지
+        
+          // 최신 10개 데이터 유지
+          const updatedData = [...prevData, newEmotion];
+          return updatedData; // return updatedData.length > 10 ? updatedData.slice(-10) : updatedData;
         });
         
       } catch (error) {
