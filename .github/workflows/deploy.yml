@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -62,5 +61,5 @@ jobs:
         file: Dockerfile
         push: true
         tags: |
-          ${{ steps.login-ecr.outputs.registry }}/fronttest/wookjin:${{ env.IMAGE_TAG }}
-          ${{ steps.login-ecr.outputs.registry }}/fronttest/wookjin:latest
+          615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:${{ env.IMAGE_TAG }}
+          615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:latest
