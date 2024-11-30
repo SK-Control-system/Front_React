@@ -1,0 +1,38 @@
+name: CI/CD to AWS ECR
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시될 때 트리거
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Repository 클론
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2. AWS CLI 및 ECR 로그인
+    - name: Log in to Amazon ECR
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        aws configure set region $AWS_REGION
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 615299753054.dkr.ecr.$AWS_REGION.amazonaws.com
+
+    # 3. Docker 이미지 빌드 및 태그
+    - name: Build and Tag Docker Image
+      run: |
+        docker build -t wookjin:latest .
+        docker tag wookjin:latest 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+
+    # 4. Docker 이미지 푸시
+    - name: Push Docker Image to Amazon ECR
+      run: |
+        docker push 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest

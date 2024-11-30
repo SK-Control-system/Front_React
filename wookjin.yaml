@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wookjin-front-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wookjin-front-test
+  template:
+    metadata:
+      labels:
+        app: wookjin-front-test
+    spec:
+      containers:
+      - name: wookjin-front-test
+        image: 615299753054.dkr.ecr.us-east-1.amazonaws.com/fronttest/wookjin
+        ports:
+        - containerPort: 80
