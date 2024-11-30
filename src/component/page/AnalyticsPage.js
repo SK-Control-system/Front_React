@@ -12,19 +12,32 @@ const AnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
   const eventSourceRef = useRef(null);
+  // const videoId = "lGWEYsSyeu4";
   const { videoId } = useParams();
 
   useEffect(() => {
+    // 로컬 스토리지 초기화
+    Object.keys(localStorage).forEach((key) => {
+      // 현재 videoId와 다른 데이터 삭제
+      if (key.startsWith("chatData_") && key !== `chatData_${videoId}`) {
+        localStorage.removeItem(key);
+      }
+    });
+
     // 로컬 스토리지에서 데이터 불러오기
     const storedChatData = localStorage.getItem(`chatData_${videoId}`);
     if (storedChatData) {
       const parsedData = JSON.parse(storedChatData); // JSON 파싱
       setChatData(parsedData);
       setTotalChatCount(parsedData.length); // 배열의 길이를 가져옴
+    } else {
+      // videoId에 해당하는 데이터가 없으면 초기화
+      setChatData([]);
+      setTotalChatCount(0);
     }
 
     // SSE 연결 시작
-    eventSourceRef.current = new EventSource(`${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId}`); // videoId ? videoId : '_L_kjyJkgwk'
+    eventSourceRef.current = new EventSource(`${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId}`);
 
     eventSourceRef.current.onmessage = (event) => {
       try {
@@ -44,7 +57,7 @@ const AnalyticsPage = () => {
         const { sentiment } = newChat.items[0];
         setEmotionData((prevData) => {
           const time = new Date().toLocaleTimeString();
-          
+
           // 새로운 감정 데이터를 기반으로 업데이트
           const newEmotion = {
             time,
@@ -54,12 +67,12 @@ const AnalyticsPage = () => {
             negative: sentiment.label === "부정" ? 1 : 0,
             veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
           };
-        
+
           // 최신 10개 데이터 유지
           const updatedData = [...prevData, newEmotion];
           return updatedData; // return updatedData.length > 10 ? updatedData.slice(-10) : updatedData;
         });
-        
+
       } catch (error) {
         console.error("SSE 데이터 처리 오류", error);
       }
