@@ -1,4 +1,4 @@
-name: CI/CD to AWS ECR and Kubernetes
+name: CI/CD to EKS
 
 on:
   push:
@@ -6,73 +6,40 @@ on:
       - main
 
 jobs:
-  build-push-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. GitHub Repository Checkout
-    - name: Checkout repository
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    # 2. Node.js 환경 준비
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
-
-    # 3. AWS Credentials 설정
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # 4. AWS ECR 로그인
-    - name: Log in to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to Amazon ECR
+      run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 615299753054.dkr.ecr.us-east-1.amazonaws.com
 
-    # 5. React 의존성 설치 및 빌드
-    - name: Install dependencies
-      run: npm install
+    - name: Build Docker Image
+      run: docker build -t 615299753054.dkr.ecr.us-east-1.amazonaws.com/fronttest/wookjin:latest .
 
-    - name: Build React Application
+    - name: Push Docker Image to ECR
       run: |
-        export REACT_APP_CHATTING_URL=${{ secrets.REACT_APP_CHATTING_URL }}
-        CI=false npm run build
+        docker tag 615299753054.dkr.ecr.us-east-1.amazonaws.com/fronttest/wookjin:latest 615299753054.dkr.ecr.us-east-1.amazonaws.com/fronttest/wookjin:latest
+        docker push 615299753054.dkr.ecr.us-east-1.amazonaws.com/fronttest/wookjin:latest
 
-    # 6. Docker Buildx 설정
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    # 7. 버전 태그 생성
-    - name: Generate version tag
-      id: vars
-      run: |
-        VERSION=$(git rev-list --count HEAD)
-        echo "VERSION=0.${VERSION}" >> $GITHUB_ENV
-        echo "IMAGE_TAG=0.${VERSION}" >> $GITHUB_ENV
-
-    # 8. Docker 이미지 빌드 및 단일 플랫폼으로 푸시
-    - name: Build and Push Docker Image to AWS ECR
-      uses: docker/build-push-action@v4
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
       with:
-        context: .
-        file: Dockerfile
-        push: true
-        platforms: linux/amd64
-        tags: |
-          615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:${{ env.IMAGE_TAG }}
-          615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:latest
+        version: 'v1.28.0'
 
-    # 9. wookjin.yaml 파일 업데이트
-    - name: Update Deployment YAML with New Image
-      run: |
-        sed -i 's|image:.*|image: 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:${{ env.IMAGE_TAG }}|' wookjin.yaml
+    - name: Update kubeconfig for EKS
+      run: aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
 
-    # 10. EKS 클러스터에 배포
     - name: Deploy to EKS
-      env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
       run: |
         kubectl apply -f wookjin.yaml
+        kubectl rollout status deployment/wookjin-front-test
