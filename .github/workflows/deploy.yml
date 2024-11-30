@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-push-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -53,13 +53,26 @@ jobs:
         echo "VERSION=0.${VERSION}" >> $GITHUB_ENV
         echo "IMAGE_TAG=0.${VERSION}" >> $GITHUB_ENV
 
-    # 8. Docker 이미지 빌드 및 푸시
+    # 8. Docker 이미지 빌드 및 단일 플랫폼으로 푸시
     - name: Build and Push Docker Image to AWS ECR
       uses: docker/build-push-action@v4
       with:
         context: .
         file: Dockerfile
         push: true
+        platforms: linux/amd64
         tags: |
           615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:${{ env.IMAGE_TAG }}
           615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:latest
+
+    # 9. wookjin.yaml 파일 업데이트
+    - name: Update Deployment YAML with New Image
+      run: |
+        sed -i 's|image:.*|image: 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/fronttest/wookjin:${{ env.IMAGE_TAG }}|' wookjin.yaml
+
+    # 10. EKS 클러스터에 배포
+    - name: Deploy to EKS
+      env:
+        KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      run: |
+        kubectl apply -f wookjin.yaml
