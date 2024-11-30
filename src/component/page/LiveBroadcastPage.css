@@ -142,3 +142,119 @@
   display: flex;
   justify-content: space-between;
 }
+.live-broadcast-view-count{
+  /* background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 2px; */
+}
+.live-broadcast-start-time{
+  font-size: 11px;
+  color: #9a9a9a;
+}
+/* 방송 통계 오버레이 */
+.broadcast-stats-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+  padding: 20px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);
+}
+/* 텍스트 통계 오버레이 */
+.text-stats-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  padding: 20px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  text-align: center;
+  opacity: 0; /* 초기 투명도 */
+  transform: scale(0.9); /* 초기 크기 */
+  transition: all 0.3s ease; /* 부드러운 전환 효과 */
+  pointer-events: none; /* 기본적으로 클릭 불가 */
+}
+
+.live-broadcast-card:hover .text-stats-overlay {
+  opacity: 1; /* hover 시 보이기 */
+  transform: scale(1); /* 크기 원래대로 */
+  pointer-events: auto; /* hover 시 클릭 가능 */
+}
+
+.text-stats-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #ffcc00; /* 강조 색상 */
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5); /* 텍스트 그림자 */
+}
+
+.text-stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.text-stats-list li {
+  font-size: 14px;
+  margin: 6px 0;
+  animation: fadeInUp 0.5s ease; /* 텍스트 애니메이션 */
+}
+
+/* 텍스트 fadeIn 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 카드 hover 효과 */
+.live-broadcast-card {
+  position: relative;
+  overflow: hidden; /* 내부 내용 잘리지 않도록 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 부드러운 카드 전환 */
+}
+
+.live-broadcast-card:hover {
+  transform: scale(1.03); /* hover 시 약간 확대 */
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); /* hover 시 그림자 강조 */
+}
+
+.live-broadcast-card-media {
+  position: absolute;
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  transition: transform 0.3s ease; /* 이미지 확대 효과 */
+}
+
+.live-broadcast-card:hover .live-broadcast-card-media {
+  transform: scale(1.1); /* hover 시 이미지 확대 */
+}

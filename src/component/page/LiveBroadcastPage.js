@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LiveBroadcastPage.css";
 
-const BroadcastCard = ({ title, channel, views, category, thumbnail, profile, starttime}) => {
+// BroadcastCard 컴포넌트
+const BroadcastCard = ({
+  videoTitle,
+  channelTitle,
+  concurrentViewers,
+  category, 
+  videoThumbnailUrl,
+  channelThumbnailUrl,
+  actualStartTime,
+  stats,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="live-broadcast-card">
+    <div
+      className="live-broadcast-card"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div
         className="live-broadcast-card-media"
-        style={{ backgroundImage: `url(${thumbnail})` }}
+        style={{ backgroundImage: `url(${videoThumbnailUrl})` }}
       ></div>
       <div className="live-broadcast-card-info">
         <div className="live-broadcast-card-name">
@@ -16,78 +32,80 @@ const BroadcastCard = ({ title, channel, views, category, thumbnail, profile, st
                 <div className="youtube-white-play"></div>
               </div>
             </div>
-            <span className="live-broadcast-channel-name">{channel}</span>
+            <span className="live-broadcast-channel-name">{channelTitle}</span>
           </div>
           <span className="live-broadcast-category">{category}</span>
         </div>
         <div className="live-broadcast-card-content">
           <img
             className="live-broadcast-channel-profile"
-            src={profile}
-            alt={`${channel} profile`}
+            src={channelThumbnailUrl}
+            alt={`${channelTitle} profile`}
           />
-          <span className="live-broadcast-card-title">{title}</span>
+          <span className="live-broadcast-card-title">{videoTitle}</span>
         </div>
         <div className="live-broadcast-card-footer">
-          <span className="live-broadcast-view-count">{views} 명 시청중</span>
-          <span className="live-broadcast-start-time"> {starttime} 시작</span>
+          <span className="live-broadcast-view-count">🔴{concurrentViewers} 명 시청중</span>
+          <span className="live-broadcast-start-time">{actualStartTime} 시작</span>
         </div>
       </div>
+      {isHovered && (
+        <div className="broadcast-stats-overlay text-stats-overlay">
+          <h4 className="text-stats-title">실시간 방송 통계</h4>
+          <ul className="text-stats-list">
+            <li>❤️ 좋아요: {stats.likes}개</li>
+            <li>💬 댓글: {stats.comments}개</li>
+            <li>😀 긍정 반응: {stats.positiveReactions}</li>
+            <li>⌛ 방송 진행 시간: {stats.averageViewTime}</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
+// LiveBroadcastPage 컴포넌트
 const LiveBroadcastPage = () => {
-  const data = {
-    categories: [
-      {
-        name: "내 구독 목록",
-        broadcasts: [
-          {
-            title: "방송 제목 1",
-            channel: "채널 1",
-            views: "10,000",
-            category: "게임",
-            thumbnail: "https://dimg.donga.com/wps/NEWS/IMAGE/2015/09/10/73552739.2.jpg",
-            profile: "https://yt3.ggpht.com/ytc/AIdro_kFqbmXOoxJIaLVQYrJMB8gR8_LTF7Wm1lDpZbCmqhJh3U=s88-c-k-c0x00ffffff-no-rj",
-            starttime:"09:17"
-          },
-          {
-            title: "방송 제목 2",
-            channel: "채널 2",
-            views: "5,000",
-            category: "음악",
-            thumbnail: "/path/to/image2.jpg",
-            profile: "https://yt3.ggpht.com/ytc/ANd9GcT_FakeProfile=s88-c-k-c0x00ffffff-no-rj",
-            starttime:"09:24"
-          },
-          
-        ],
-      },
-      {
-        name: "리그 오브 레전드",
-        broadcasts: [
-          {
-            title: "롤 경기 1",
-            channel: "롤 채널",
-            views: "8,000",
-            category: "리그 오브 레전드",
-            thumbnail: "/path/to/image3.jpg",
-            profile: "https://yt3.ggpht.com/ytc/ANd9GcT_RiotGames=s88-c-k-c0x00ffffff-no-rj",
-            starttime:"09:34"
-          },
-        ],
-      },
-    ],
-  };
+  const rawData = [
+    // 주어진 JSON 데이터 (문자열 형태)
+    "{\"videoId\":\"8dYNg7bmS5c\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-04-12T10:23:19Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"8dYNg7bmS5c\",\"videoTitle\":\"계절의 시작과 끝에 듣는 노래 l 비긴어게인\",\"concurrentViewers\":\"887\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-8dYNg7bmS5c.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for Beginagain 비긴어게인\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/8dYNg7bmS5c/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"397\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"music\",\"channelId\":\"UC8dYNg7bmS5c\",\"channelTitle\":\"Beginagain 비긴어게인\"}}",
+    "{\"videoId\":\"4yTnlpI0ZQw\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-11-01T12:00:00Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"4yTnlpI0ZQw\",\"videoTitle\":\"프로 게이머와 함께하는 생방송!\",\"concurrentViewers\":\"13007\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-4yTnlpI0ZQw.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for GamingPro\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/4yTnlpI0ZQw/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"120097\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"gaming\",\"channelId\":\"UC4yTnlpI0ZQw\",\"channelTitle\":\"GamingPro\"}}",
+    "{\"videoId\":\"3kLMnNpXY9z\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-08-15T14:30:00Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"3kLMnNpXY9z\",\"videoTitle\":\"전 세계의 새로운 과학 뉴스 탐구\",\"concurrentViewers\":\"6887\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-3kLMnNpXY9z.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for ScienceDaily\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/3kLMnNpXY9z/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"63217\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"education\",\"channelId\":\"UC3kLMnNpXY9z\",\"channelTitle\":\"ScienceDaily\"}}",
+  ];
+
+  // JSON 문자열을 객체로 변환
+  const parsedData = rawData.map((item) => JSON.parse(item).videoData);
+
+  // 카테고리별로 그룹화
+  const groupedData = parsedData.reduce((acc, video) => {
+    if (!acc[video.category]) acc[video.category] = [];
+    acc[video.category].push(video);
+    return acc;
+  }, {});
+
   return (
     <div className="live-broadcast-page">
-      {data.categories.map((category, index) => (
+      {Object.keys(groupedData).map((category, index) => (
         <div key={index} className="live-broadcast-category-section">
-          <h2 className="live-broadcast-category-title">{category.name}</h2>
+          <h2 className="live-broadcast-category-title">{category}</h2>
           <div className="live-broadcast-list">
-            {category.broadcasts.map((broadcast, idx) => (
-              <BroadcastCard key={idx} {...broadcast} />
+            {groupedData[category].map((broadcast, idx) => (
+              <BroadcastCard
+                key={idx}
+                videoTitle={broadcast.videoTitle}
+                channelTitle={broadcast.channelTitle}
+                concurrentViewers={broadcast.concurrentViewers}
+                category={broadcast.category}
+                videoThumbnailUrl={broadcast.videoThumbnailUrl}
+                channelThumbnailUrl={broadcast.channelThumbnailUrl}
+                actualStartTime={new Date(broadcast.actualStartTime).toLocaleString()}
+                stats={{
+                  likes: broadcast.ikeCount || 0,
+                  comments: 450, // 임시 데이터
+                  positiveReactions: "80%", // 임시 데이터
+                  averageViewTime: "15분", // 임시 데이터
+                }}
+              />
             ))}
           </div>
         </div>

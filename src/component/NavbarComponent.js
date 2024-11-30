@@ -10,8 +10,10 @@ function NavbarComponent() {
           라온
         </Navbar.Brand>
           <Nav className="me-auto">
-          <Nav.Link as={Link} to="/analytics">Analytics</Nav.Link>
-          <Nav.Link as={Link} to="/livebroadcast">Pricing</Nav.Link>
+          <Nav.Link as={Link} to="/analytics">실시간 방송통계</Nav.Link>
+          <Nav.Link as={Link} to="/livebroadcast">라이브 방송목록</Nav.Link>
+          <Nav.Link as={Link} to="/channel">채널 통계</Nav.Link>
+
           </Nav>
         </Container>
       </Navbar>
