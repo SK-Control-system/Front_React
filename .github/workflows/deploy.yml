@@ -1,38 +1,66 @@
-name: CI/CD to AWS ECR
+name: CI/CD to AWS ECR and Kubernetes
 
 on:
   push:
     branches:
-      - main # main 브랜치에 푸시될 때 트리거
+      - main
+
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Repository 클론
+    # 1. GitHub Repository Checkout
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. AWS CLI 및 ECR 로그인
+    # 2. Node.js 환경 준비
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    # 3. AWS Credentials 설정
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # 4. AWS ECR 로그인
     - name: Log in to Amazon ECR
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-      run: |
-        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-        aws configure set region $AWS_REGION
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 615299753054.dkr.ecr.$AWS_REGION.amazonaws.com
+      uses: aws-actions/amazon-ecr-login@v1
 
-    # 3. Docker 이미지 빌드 및 태그
-    - name: Build and Tag Docker Image
-      run: |
-        docker build -t wookjin:latest .
-        docker tag wookjin:latest 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+    # 5. React 의존성 설치 및 빌드
+    - name: Install dependencies
+      run: npm install
 
-    # 4. Docker 이미지 푸시
-    - name: Push Docker Image to Amazon ECR
+    - name: Build React Application
       run: |
-        docker push 615299753054.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+        export REACT_APP_CHATTING_URL=${{ secrets.REACT_APP_CHATTING_URL }}
+        CI=false npm run build
+
+    # 6. Docker Buildx 설정
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    # 7. 버전 태그 생성
+    - name: Generate version tag
+      id: vars
+      run: |
+        VERSION=$(git rev-list --count HEAD)
+        echo "VERSION=0.${VERSION}" >> $GITHUB_ENV
+        echo "IMAGE_TAG=0.${VERSION}" >> $GITHUB_ENV
+
+    # 8. Docker 이미지 빌드 및 푸시
+    - name: Build and Push Docker Image to AWS ECR
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: Dockerfile
+        push: true
+        tags: |
+          ${{ steps.login-ecr.outputs.registry }}/fronttest/wookjin:${{ env.IMAGE_TAG }}
+          ${{ steps.login-ecr.outputs.registry }}/fronttest/wookjin:latest
