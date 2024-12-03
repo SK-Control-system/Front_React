@@ -12,8 +12,8 @@ const AnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
   const eventSourceRef = useRef(null);
-  // const videoId = "lGWEYsSyeu4";
-  const { videoId } = useParams();
+  const videoId = "_L_kjyJkgwk";
+  // const { videoId } = useParams();
 
   useEffect(() => {
     // 로컬 스토리지 초기화
