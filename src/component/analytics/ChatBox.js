@@ -1,26 +1,7 @@
 import React from "react";
 import "./ChatBox.css";
 
-const ChatBox = () => {
-  const chatData = [
-    {
-      id: 1,
-      user: "레이첼",
-      time: "오후 1:27",
-      sentiment: "매우 부정",
-      message: "아 스브링이 진짜 짜증나네",
-      profilePic: "https://yt3.ggpht.com/ytc/AIdro_kFqbmXOoxJIaLVQYrJMB8gR8_LTF7Wm1lDpZbCmqhJh3U=s88-c-k-c0x00ffffff-no-rj",
-    },
-    {
-      id: 2,
-      user: "조재근",
-      time: "오후 1:28",
-      sentiment: "부정",
-      message: "다들 뭐야 이게...",
-      profilePic: "https://yt3.ggpht.com/ezG7fZAoI4puqxZvEHRY0Xfwl6CcR3bWRadwh-lg_-JSuBw9aK6hpJuR5wIlu1WHhsvseAWzfyA=s88-c-k-c0x00ffffff-no-rj",
-    },
-    // 더미 데이터 추가 가능
-  ];
+const ChatBox = ({ chatData }) => {
 
   const sentimentColors = {
     "매우 긍정": "#4caf50",
@@ -36,28 +17,28 @@ const ChatBox = () => {
       <div className="chat-messages">
         {chatData.map((chat) => (
           <div
-            key={chat.id}
+            key={`${chat.items[0].chatterChannelId}_${chat.items[0].chatTime}_${Math.random()}`}
             className="chat-message"
-            style={{ borderLeft: `5px solid ${sentimentColors[chat.sentiment]}` }}
+            style={{ borderLeft: `5px solid ${sentimentColors[chat.items[0].sentiment.label]}` }}
           >
             <img
-              src={chat.profilePic}
-              alt={`${chat.user} profile`}
+              src={chat.items[0].chatterImageUrl}
+              alt={`${chat.items[0].chatterName} profile`}
               className="chat-profile-pic"
             />
             <div className="chat-content">
               <div className="chat-info">
-                <strong className="chat-user">{chat.user}
-                  <span className="chat-time">{chat.time}</span>
+                <strong className="chat-user">{chat.items[0].chatterName}
+                  <span className="chat-time">{chat.items[0].chatTime}</span>
                 </strong>
               </div>
-              <p className="chat-text">{chat.message}</p>
+              <p className="chat-text">{chat.items[0].message}</p>
             </div>
             <span
               className="chat-sentiment"
-              style={{ backgroundColor: sentimentColors[chat.sentiment] }}
+              style={{ backgroundColor: sentimentColors[chat.items[0].sentiment.label] }}
             >
-              {chat.sentiment}
+              {chat.items[0].sentiment.label}
             </span>
           </div>
         ))}
