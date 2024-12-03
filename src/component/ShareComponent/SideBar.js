@@ -15,7 +15,7 @@ const SideBar = () => {
       <h2 className="channel-name">루키즈1조</h2>
       <ul className="menu">
         <li>
-          <Link to="/dashboard">
+          <Link to="/">
             <FaHome />
             <span className="menu-text">대시보드</span>
           </Link>

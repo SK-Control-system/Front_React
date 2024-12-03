@@ -76,7 +76,9 @@ function App() {
             path="/livebroadcast"
             element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
           />
-          <Route path="/channel" element={<ChannelAnalyticsPage />} />
+          {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
+          <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+
         </Routes>
 
       </Router>
