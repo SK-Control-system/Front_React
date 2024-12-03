@@ -1,0 +1,79 @@
+.sidebar {
+  width: 60px;
+  background-color: #202020;
+  color: #fff;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  padding: 10px;
+  text-align: center;
+}
+
+.sidebar.expanded {
+  width: 250px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 아이콘과 텍스트 간 간격 */
+  
+  padding: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.menu li a {
+  color: #cccccc;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.menu li a:hover {
+  color: #fff;
+}
+
+.menu li:hover {
+  background-color: #333333;
+}
+
+.menu li.active {
+  background-color: #03a9f4;
+  color: #fff;
+}
+
+.menu-text{
+  font-family: "NanumSquare Neo OTF"
+  
+}
+
+.menu li .menu-text {
+  display: none; /* 기본적으로 텍스트 숨기기 */
+}
+
+.sidebar.expanded .menu li .menu-text {
+  display: inline; /* 확장 상태에서는 텍스트 표시 */
+  margin-left: 20px;
+}
+
+.channel-name {
+  font-size: 25px;
+  margin-bottom: 20px;
+  color: #03a9f4;
+  display: none;
+  
+}
+
+.sidebar.expanded .channel-name{
+  display: inline;
+}
