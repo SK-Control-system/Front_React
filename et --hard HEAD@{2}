@@ -1,0 +1,32 @@
+[33mad7ef48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop-kwj[m[33m, [m[1;31morigin/develop-kwj[m[33m)[m HEAD@{0}: pull origin main: updating HEAD
+[33mad7ef48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop-kwj[m[33m, [m[1;31morigin/develop-kwj[m[33m)[m HEAD@{1}: checkout: moving from main to develop-kwj
+[33m2f5fb8f[m[33m ([m[1;32mmain[m[33m)[m HEAD@{2}: commit: 사이드바
+[33m3b3234a[m HEAD@{3}: commit: eks자동푸시
+[33mf407e3b[m HEAD@{4}: commit: eks배포자동화테스트
+[33m46f2066[m HEAD@{5}: commit: workflow수정
+[33m26c1fb5[m HEAD@{6}: commit (merge): 테스트4
+[33me6cb109[m HEAD@{7}: commit: 자동화테스트4
+[33mad7ef48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop-kwj[m[33m, [m[1;31morigin/develop-kwj[m[33m)[m HEAD@{8}: merge develop-kwj: Fast-forward
+[33m56cac92[m HEAD@{9}: checkout: moving from develop-kwj to main
+[33mad7ef48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop-kwj[m[33m, [m[1;31morigin/develop-kwj[m[33m)[m HEAD@{10}: commit: test3
+[33m9c7ba48[m HEAD@{11}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{12}: checkout: moving from develop-kwj to main
+[33m9c7ba48[m HEAD@{13}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{14}: checkout: moving from develop-kwj to main
+[33m9c7ba48[m HEAD@{15}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{16}: checkout: moving from develop-kwj to main
+[33m9c7ba48[m HEAD@{17}: commit: cicdtest2
+[33m5fdfd36[m HEAD@{18}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{19}: checkout: moving from develop-kwj to main
+[33m5fdfd36[m HEAD@{20}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{21}: checkout: moving from develop-kwj to main
+[33m5fdfd36[m HEAD@{22}: commit: cicd자동화테스트
+[33m1700b5d[m HEAD@{23}: commit: 카드컴포넌트 데이터형식정의, API연결준비완료
+[33m56cac92[m HEAD@{24}: checkout: moving from main to develop-kwj
+[33m56cac92[m HEAD@{25}: commit: 카드컴포넌트
+[33mb33cfa5[m HEAD@{26}: commit: 통계컴포넌트 반응형 적용
+[33mf37ec03[m HEAD@{27}: commit: 통계 컴포넌트-시청자반응분석
+[33m2e249c4[m HEAD@{28}: commit: 원형차트완성
+[33m656edec[m HEAD@{29}: commit: 시청자 수 그래프 토글화
+[33md72085e[m HEAD@{30}: commit: 통계컴포넌트,그래프차트,원형차트
+[33m6a227df[m HEAD@{31}: commit (initial): 최초진입화면,메인페이지, 페이지라우팅

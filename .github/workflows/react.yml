@@ -1,0 +1,66 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: 
+      - main
+
+env:
+  REACT_APP_CHATTING_URL: ${{ secrets.REACT_APP_CHATTING_URL }}
+
+jobs:
+  Docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # AWS 크레덴셜 구성
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # AWS ECR 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build React Application
+        run: |
+          export REACT_APP_CHATTING_URL=${{ secrets.REACT_APP_CHATTING_URL }}
+          CI=false npm run build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2   
+  
+      - name: Build and Push Docker Image to AWS ECR
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/live_on_fe:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/live_on_fe:latest
+      
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name CC-cluster
+
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: live_on_fe
+          IMAGE_TAG: ${{ github.run_number }}
+        run: |
+          kubectl set image deployment/jwtauth jwt-auth-api=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl rollout status deployment/jwtauth

@@ -142,11 +142,7 @@
   display: flex;
   justify-content: space-between;
 }
-.live-broadcast-view-count{
-  /* background-color: #1a1a1a;
-  border-radius: 12px;
-  padding: 2px; */
-}
+
 .live-broadcast-start-time{
   font-size: 11px;
   color: #9a9a9a;
