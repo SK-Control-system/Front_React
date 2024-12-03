@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.8",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
     "d3": "^7.9.0",
@@ -45,5 +46,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "http://a7894a85a5eb54ff49f84008db827179-527169829.us-east-1.elb.amazonaws.com:8888"
 }

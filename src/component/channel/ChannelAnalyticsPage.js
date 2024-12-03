@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import "./ChannelAnalyticsPage.css";
 
 const ChannelAnalyticsPage = () => {
+  const { videoId } = useParams(); // URL에서 videoId를 가져옴
+  const [currentChannelData, setCurrentChannelData] = useState(null);
   const [activeTab, setActiveTab] = useState("개요");
 
-  const stats = {
-    views: 976,
-    viewChange: 55,
-    watchTime: 11.1,
-    watchChange: 56,
-    subscribers: 2,
-    subChange: 94,
-  };
-
+  // 기존 데이터 유지
   const viewerHistory = [
     { time: "2024-11-01", viewers: 10 },
     { time: "2024-11-02", viewers: 50 },
@@ -52,9 +47,32 @@ const ChannelAnalyticsPage = () => {
     },
   ];
 
+  // LiveBroadcastPage에서 전달된 rawData
+  const rawData = [
+    "{\"videoId\":\"8dYNg7bmS5c\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-04-12T10:23:19Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"8dYNg7bmS5c\",\"videoTitle\":\"계절의 시작과 끝에 듣는 노래 l 비긴어게인\",\"concurrentViewers\":\"887\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-8dYNg7bmS5c.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for Beginagain 비긴어게인\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/8dYNg7bmS5c/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"397\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"music\",\"channelId\":\"UC8dYNg7bmS5c\",\"channelTitle\":\"Beginagain 비긴어게인\"}}",
+    "{\"videoId\":\"4yTnlpI0ZQw\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-11-01T12:00:00Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"4yTnlpI0ZQw\",\"videoTitle\":\"프로 게이머와 함께하는 생방송!\",\"concurrentViewers\":\"13007\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-4yTnlpI0ZQw.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for GamingPro\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/4yTnlpI0ZQw/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"120097\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"gaming\",\"channelId\":\"UC4yTnlpI0ZQw\",\"channelTitle\":\"GamingPro\"}}",
+    "{\"videoId\":\"3kLMnNpXY9z\",\"videoData\":{\"channelAPIReceivedTime\":\"2024-11-26 14:16:00\",\"actualStartTime\":\"2024-08-15T14:30:00Z\",\"categoryAPIReceivedTime\":\"2024-11-26 14:15:57\",\"channelSubscriberCount\":\"1830000\",\"channelPublishedAt\":\"2020-05-08T01:06:09.310775Z\",\"videoId\":\"3kLMnNpXY9z\",\"videoTitle\":\"전 세계의 새로운 과학 뉴스 탐구\",\"concurrentViewers\":\"6887\",\"channelThumbnailUrl\":\"https://yt3.ggpht.com/sample-3kLMnNpXY9z.jpg\",\"videoAPIReceivedTime\":\"2024-11-26 14:17:44\",\"channelDescription\":\"Sample description for ScienceDaily\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/3kLMnNpXY9z/hqdefault_live.jpg\",\"channelViewCount\":\"1173570495\",\"ikeCount\":\"63217\",\"actualEndTime\":null,\"viewCount\":\"1807571\",\"category\":\"education\",\"channelId\":\"UC3kLMnNpXY9z\",\"channelTitle\":\"ScienceDaily\"}}",
+  ];
+
+  useEffect(() => {
+    const parsedData = rawData.map((item) => JSON.parse(item).videoData);
+    const channelData = parsedData.find((data) => data.videoId === videoId);
+    setCurrentChannelData(channelData);
+  }, [videoId]);
+
+  if (!currentChannelData) {
+    return <p>Loading...</p>;
+  }
+
+  // 방송 시간 계산
+  const calculateWatchTime = (startTime) => {
+    const start = new Date(startTime);
+    const now = new Date();
+    return Math.floor((now - start) / (1000 * 60 * 60)); // 시간 단위로 변환
+  };
+
   return (
     <div className="channel-analytics-page">
-      
       <div className="main-chancontent">
         <h1 className="page-title">채널 분석</h1>
         <nav className="tab2s">
@@ -70,49 +88,37 @@ const ChannelAnalyticsPage = () => {
           >
             콘텐츠
           </button>
-          <button
-            className={`tab2 ${activeTab === "시청자층" ? "active" : ""}`}
-            onClick={() => setActiveTab("시청자층")}
-          >
-            시청자층
-          </button>
-          <button
-            className={`tab2 ${activeTab === "아이디어" ? "active" : ""}`}
-            onClick={() => setActiveTab("아이디어")}
-          >
-            아이디어
-          </button>
         </nav>
 
         {/* 개요 탭 */}
         {activeTab === "개요" && (
           <>
             <section className="summary">
-              <h2>지난 28일 동안 채널의 조회수가 {stats.views}회입니다</h2>
+              <h2>지난 28일 동안 채널의 조회수가 {currentChannelData.channelViewCount}회입니다</h2>
               <div className="summary-stats">
                 <div className="stat-box">
                   <p className="stat-label">조회수</p>
                   <p className="stat-value">
-                    {stats.views}{" "}
-                    <span className="stat-change up">▲ {stats.viewChange}%</span>
+                    {currentChannelData.channelViewCount}{" "}
+                    <span className="stat-change up">▲ 20%</span>
                   </p>
-                  <p className="stat-desc">지난 28일보다 {stats.viewChange}% 많음</p>
+                  <p className="stat-desc">지난 28일보다 20% 증가</p>
                 </div>
                 <div className="stat-box">
                   <p className="stat-label">방송 시간 (단위: 시간)</p>
                   <p className="stat-value">
-                    {stats.watchTime}{" "}
-                    <span className="stat-change down">▼ {stats.watchChange}%</span>
+                    {calculateWatchTime(currentChannelData.actualStartTime)}{" "}
+                    <span className="stat-change down">▼ 10%</span>
                   </p>
-                  <p className="stat-desc">지난 28일보다 {stats.watchChange}% 적음</p>
+                  <p className="stat-desc">지난 28일보다 10% 감소</p>
                 </div>
                 <div className="stat-box">
                   <p className="stat-label">구독자</p>
                   <p className="stat-value">
-                    {stats.subscribers}{" "}
-                    <span className="stat-change down">▼ {stats.subChange}</span>
+                    {currentChannelData.channelSubscriberCount}{" "}
+                    <span className="stat-change down">▼ 5%</span>
                   </p>
-                  <p className="stat-desc">지난 28일보다 {stats.subChange}% 적음</p>
+                  <p className="stat-desc">지난 28일보다 5% 감소</p>
                 </div>
               </div>
             </section>
@@ -142,11 +148,7 @@ const ChannelAnalyticsPage = () => {
             <div className="video-list">
               {videos.map((video, index) => (
                 <div key={index} className="video-item">
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="video-thumbnail"
-                  />
+                  <img src={video.thumbnail} alt={video.title} className="video-thumbnail" />
                   <div className="video-info">
                     <h3 className="video-title">{video.title}</h3>
                     <p className="video-date">{video.date}</p>
