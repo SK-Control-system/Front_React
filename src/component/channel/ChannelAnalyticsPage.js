@@ -54,20 +54,8 @@ const ChannelAnalyticsPage = () => {
 
   return (
     <div className="channel-analytics-page">
-      <div className="sidebar">
-        <h2>내 채널</h2>
-        <p className="channel-name">루키즈1조</p>
-        <ul className="menu">
-          <li>대시보드</li>
-          <li>콘텐츠</li>
-          <li className="active">분석</li>
-          <li>커뮤니티</li>
-          <li>자막</li>
-          <li>저작권</li>
-          <li>설정</li>
-        </ul>
-      </div>
-      <div className="main-content">
+      
+      <div className="main-chancontent">
         <h1 className="page-title">채널 분석</h1>
         <nav className="tab2s">
           <button

@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import NavbarComponent from "./component/NavbarComponent";
+import NavbarComponent from "./component/ShareComponent/NavbarComponent";
+import SideBar from "./component/ShareComponent/SideBar"
 import MainPage from "./component/page/MainPage";
 import AnalyticsPage from "./component/page/AnalyticsPage";
 import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
@@ -64,6 +65,7 @@ function App() {
   return (
       <Router>
         <NavbarComponent />
+        <SideBar/>
         <Routes>
           <Route
             path="/"
@@ -76,6 +78,7 @@ function App() {
           />
           <Route path="/channel" element={<ChannelAnalyticsPage />} />
         </Routes>
+
       </Router>
   );
 }

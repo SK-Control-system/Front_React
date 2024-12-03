@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Tabs from "../analytics/Tabs";
 import EmotionTrendChart from "../analytics/EmotionTrendChart";
 import ChatBox from "../analytics/ChatBox";
-import { useParams } from "react-router-dom";
 
 const AnalyticsPage = () => {
   const [emotionData, setEmotionData] = useState([]);
