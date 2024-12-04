@@ -107,6 +107,7 @@ const AnalyticsPage = () => {
   return (
     <div className="analytics-container">
       <div className="좌측">
+        <div className="chatsearch">
         <input
           type="text"
           placeholder="채팅 검색..."
@@ -114,7 +115,9 @@ const AnalyticsPage = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="chat-search"
         />
-        <p>총 채팅 수: {totalChatCount}</p> {/* 총 갯수 표시 */}
+        <p>총 채팅 수: {totalChatCount}</p> {/* 총 갯수 표시 */} 
+        </div>
+        
         <ChatBox chatData={filteredChatData} />
       </div>
       <div className="우측">
