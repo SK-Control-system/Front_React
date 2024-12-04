@@ -13,7 +13,7 @@ const ChatBox = ({ chatData }) => {
 
   return (
     <div className="chat-box">
-      <h2 className="chat-header">Real-time Live Chat</h2>
+      <h2 className="chat-header">실시간 채팅창</h2>
       <div className="chat-messages">
         {chatData.map((chat) => (
           <div

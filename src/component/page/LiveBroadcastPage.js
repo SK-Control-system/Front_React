@@ -80,33 +80,50 @@ const LiveBroadcastPage = () => {
   useEffect(() => {
     const fetchBroadcastData = async () => {
       try {
-        const response = axios.get("/api/redis/get/hash/videoId")
-        .then(response => console.log(response.data))
-        .catch(error => console.error(error));
-      
-
-        const rawData = response.data; // Axios 응답 데이터
-        const parsedData = Object.values(rawData).map((item) => JSON.parse(item));
-
+        // API 호출
+        const response = await axios.get("/api/redis/get/hash/videoId");
+        console.log(response.data);
+        if (!response.data) {
+          throw new Error("API에서 데이터를 받지 못했습니다.");
+        }
+  
+        // 데이터 파싱
+        const rawData = Object.values(response.data).map((item) => {
+          try {
+            return JSON.parse(item);
+          } catch (e) {
+            console.error("JSON 파싱 에러:", e);
+            return {}; // 파싱 실패한 경우 빈 객체로 대체
+          }
+        });
+  
+        // 유효하지 않은 데이터 필터링
+        const validData = rawData.filter((video) => video.videoId);
+  
         // 데이터를 카테고리별로 그룹화
-        const grouped = parsedData.reduce((acc, video) => {
+        const grouped = validData.reduce((acc, video) => {
           const category = video.category || "기타";
           if (!acc[category]) acc[category] = [];
           acc[category].push(video);
           return acc;
         }, {});
-
+  
+        // 상태 업데이트
         setGroupedData(grouped);
         setLoading(false);
       } catch (err) {
+        console.error("데이터 가져오기 실패:", err);
         setError(err.message);
         setLoading(false);
       }
     };
-
+  
     fetchBroadcastData();
   }, []);
+  
 
+
+  
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
