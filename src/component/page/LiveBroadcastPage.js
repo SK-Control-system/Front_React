@@ -1,20 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./LiveBroadcastPage.css";
 import { Link } from "react-router-dom";
 
-// BroadcastCard 컴포넌트
-const BroadcastCard = ({
-  videoTitle,
-  channelTitle,
-  concurrentViewers,
-  category,
-  videoThumbnailUrl,
-  channelThumbnailUrl,
-  actualStartTime,
-  stats,
-  videoId,
-}) => {
+const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, videoThumbnailUrl, channelThumbnailUrl, actualStartTime, stats, videoId }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -71,44 +60,35 @@ const BroadcastCard = ({
   );
 };
 
-// LiveBroadcastPage 컴포넌트
 const LiveBroadcastPage = () => {
   const [groupedData, setGroupedData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const scrollRefs = useRef({});
 
   useEffect(() => {
     const fetchBroadcastData = async () => {
       try {
-        // API 호출
         const response = await axios.get("/api/redis/get/hash/videoId");
-        console.log(response.data);
-        if (!response.data) {
-          throw new Error("API에서 데이터를 받지 못했습니다.");
-        }
-  
-        // 데이터 파싱
+        if (!response.data) throw new Error("API에서 데이터를 받지 못했습니다.");
+
         const rawData = Object.values(response.data).map((item) => {
           try {
             return JSON.parse(item);
           } catch (e) {
             console.error("JSON 파싱 에러:", e);
-            return {}; // 파싱 실패한 경우 빈 객체로 대체
+            return {};
           }
         });
-  
-        // 유효하지 않은 데이터 필터링
+
         const validData = rawData.filter((video) => video.videoId);
-  
-        // 데이터를 카테고리별로 그룹화
         const grouped = validData.reduce((acc, video) => {
           const category = video.category || "기타";
           if (!acc[category]) acc[category] = [];
           acc[category].push(video);
           return acc;
         }, {});
-  
-        // 상태 업데이트
+
         setGroupedData(grouped);
         setLoading(false);
       } catch (err) {
@@ -117,13 +97,18 @@ const LiveBroadcastPage = () => {
         setLoading(false);
       }
     };
-  
+
     fetchBroadcastData();
   }, []);
-  
 
+  const scroll = (category, direction) => {
+    const scrollElement = scrollRefs.current[category];
+    if (scrollElement) {
+      const scrollAmount = direction === "left" ? -600 : 600;
+      scrollElement.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
-  
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -132,26 +117,43 @@ const LiveBroadcastPage = () => {
       {Object.keys(groupedData).map((category, index) => (
         <div key={index} className="live-broadcast-category-section">
           <h2 className="live-broadcast-category-title">{category}</h2>
-          <div className="live-broadcast-list">
-            {groupedData[category].map((broadcast, idx) => (
-              <BroadcastCard
-                key={idx}
-                videoId={broadcast.videoId}
-                videoTitle={broadcast.videoTitle}
-                channelTitle={broadcast.channelTitle}
-                concurrentViewers={broadcast.concurrentViewers}
-                category={broadcast.category}
-                videoThumbnailUrl={broadcast.videoThumbnailUrl}
-                channelThumbnailUrl={broadcast.channelThumbnailUrl}
-                actualStartTime={broadcast.actualStartTime}
-                stats={{
-                  likes: broadcast.likeCount,
-                  comments: 450, // 임시 데이터
-                  positiveReactions: "80%", // 임시 데이터
-                  averageViewTime: "15분", // 임시 데이터
-                }}
-              />
-            ))}
+          <div className="live-broadcast-list-container">
+            <button
+              className="scroll-button left"
+              onClick={() => scroll(category, "left")}
+            >
+              ◀
+            </button>
+            <div
+              className="live-broadcast-list"
+              ref={(el) => (scrollRefs.current[category] = el)}
+            >
+              {groupedData[category].map((broadcast, idx) => (
+                <BroadcastCard
+                  key={idx}
+                  videoId={broadcast.videoId}
+                  videoTitle={broadcast.videoTitle}
+                  channelTitle={broadcast.channelTitle}
+                  concurrentViewers={broadcast.concurrentViewers}
+                  category={broadcast.category}
+                  videoThumbnailUrl={broadcast.videoThumbnailUrl}
+                  channelThumbnailUrl={broadcast.channelThumbnailUrl}
+                  actualStartTime={broadcast.actualStartTime}
+                  stats={{
+                    likes: broadcast.likeCount,
+                    comments: 450,
+                    positiveReactions: "80%",
+                    averageViewTime: "15분",
+                  }}
+                />
+              ))}
+            </div>
+            <button
+              className="scroll-button right"
+              onClick={() => scroll(category, "right")}
+            >
+              ▶
+            </button>
           </div>
         </div>
       ))}
