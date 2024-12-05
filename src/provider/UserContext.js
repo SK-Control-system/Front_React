@@ -3,18 +3,18 @@ import { createContext, useContext, useEffect, useState } from "react"
 const UserContext = createContext(null);
 
 export const UserProvider = ({children}) =>{
-    const [token, setToken] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
+        const storedUserId = localStorage.getItem("userId");
 
-        if(storedToken){
-            setToken(storedToken);
+        if(storedUserId){
+            setUserId(storedUserId);
         }
     }, []);
 
     return(
-        <UserContext.Provider value={{token, setToken}}>
+        <UserContext.Provider value={{userId, setUserId}}>
             {children}
         </UserContext.Provider>
     )
