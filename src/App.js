@@ -8,6 +8,8 @@ import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
+import { WebSocketProvider } from "./provider/websocketContext";
+import { UserProvider } from "./provider/UserContext";
 function App() {
   const stats = {
     totalViewers: 72131,
@@ -85,25 +87,28 @@ function App() {
   };
 
   return (
-      <Router>
-        <NavbarComponent />
-        <SideBar/>
-        <Routes>
-          <Route
-            path="/"
-            element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
-          />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route
-            path="/livebroadcast"
-            element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
-          />
-          {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
-          <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+    <UserProvider>
+      <WebSocketProvider>
+        <Router>
+          <NavbarComponent />
+          <SideBar />
+          <Routes>
+            <Route
+              path="/"
+              element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
+            />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route
+              path="/livebroadcast"
+              element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
+            />
+            {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
+            <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
 
-        </Routes>
-
-      </Router>
+          </Routes>
+        </Router>
+      </WebSocketProvider>
+    </UserProvider>
   );
 }
 
