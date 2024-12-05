@@ -61,6 +61,28 @@ function App() {
     },
   ];
 
+  const handleGoogleLogin = async () => {
+    try {
+      // Google 로그인 요청
+      const auth2 = window.gapi.auth2.getAuthInstance();
+      const googleUser = await auth2.signIn();
+      const idToken = googleUser.getAuthResponse().id_token;
+
+      // 백엔드 API 호출
+      const response = await fetch(`https://${process.env.REACT_APP_BACKEND_POD_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      const data = await response.json();
+
+      sessionStorage.setItem('userId', data.body.userId);
+    } catch (error) {
+      console.error('로그인 중 오류 발생:', error)
+    }
+  };
 
   return (
       <Router>
