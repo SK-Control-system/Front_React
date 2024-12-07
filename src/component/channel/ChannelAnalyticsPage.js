@@ -96,6 +96,11 @@ const ChannelAnalyticsPage = () => {
   }
 
   const parseCustomDate = (dateString) => {
+    if (!dateString || typeof dateString !== "string") {
+      console.error("유효하지 않은 dateString:", dateString);
+      return NaN; // Invalid date
+    }
+  
     const parts = dateString.split(" "); // "Mon Dec 02 05:50:40 KST" 분리
     const months = {
       Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -103,12 +108,11 @@ const ChannelAnalyticsPage = () => {
     };
     const month = months[parts[1]];
     const day = parseInt(parts[2], 10);
-    const [hours, minutes, seconds] = parts[3].split(":").map(Number);
+    const [hours, minutes, seconds] = parts[3]?.split(":").map(Number) || [];
     const year = new Date().getFullYear(); // 연도를 현재 연도로 설정
   
     return new Date(year, month, day, hours, minutes, seconds);
   };
-  
   const calculateWatchTime = (startTime) => {
     const start = parseCustomDate(startTime);
     if (isNaN(start)) {
