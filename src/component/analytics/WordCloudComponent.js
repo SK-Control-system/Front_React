@@ -64,7 +64,7 @@ const WordCloudComponent = ({ currentDate, videoId }) => {
         WordCloud(canvas, {
           list: wordList,
           gridSize: Math.max(8, Math.floor(containerWidth / 100)), // 단어 간격
-          weightFactor: Math.min(containerWidth, containerHeight) / 70, // 단어 크기 비율
+          weightFactor: Math.min(containerWidth, containerHeight) / 200, // 단어 크기 비율
           fontFamily: "NanumSquare Neo OTF, sans-serif",
           color: () => `#${Math.floor(Math.random() * 16777215).toString(16)}`, // 랜덤 색상
           rotationSteps: 5, // 회전 각도
