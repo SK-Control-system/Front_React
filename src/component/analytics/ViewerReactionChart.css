@@ -48,3 +48,11 @@
   margin-bottom: 20px;
 }
 
+.sentiment-title{
+  font-family: 'NanumSquare Neo OTF', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 42px;
+  text-align: center;
+  margin-bottom: 20px;
+}
