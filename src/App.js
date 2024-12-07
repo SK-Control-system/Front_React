@@ -8,6 +8,9 @@ import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
+import { UserProvider } from "./provider/UserContext";
+import { WebSocketProvider } from "./provider/WebSocketContext";
+
 function App() {
   const stats = {
     totalViewers: 72131,
@@ -61,28 +64,30 @@ function App() {
     },
   ];
 
-
   return (
-      <Router>
-        <NavbarComponent />
-        <SideBar/>
-        <Routes>
-          <Route
-            path="/"
-            element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
-          />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
-          <Route
-            path="/livebroadcast"
-            element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
-          />
-          {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
-          <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
 
-        </Routes>
-
-      </Router>
+    <UserProvider>
+      <WebSocketProvider>
+        <Router>
+          <NavbarComponent />
+          <SideBar />
+          <Routes>
+            <Route
+              path="/"
+              element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
+            />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
+            <Route
+              path="/livebroadcast"
+              element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
+            />
+            {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
+            <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+          </Routes>
+        </Router>
+      </WebSocketProvider>
+    </UserProvider>
   );
 }
 

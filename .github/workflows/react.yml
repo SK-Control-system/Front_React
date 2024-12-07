@@ -62,5 +62,5 @@ jobs:
           ECR_REPOSITORY: live_on_fe
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          kubectl set image deployment/jwtauth jwt-auth-api=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          kubectl rollout status deployment/jwtauth
+          kubectl set image deployment/live-on-fe live-on-fe=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl rollout status deployment/live-on-fe

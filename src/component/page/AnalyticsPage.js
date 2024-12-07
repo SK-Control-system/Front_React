@@ -11,7 +11,7 @@ const AnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
   const eventSourceRef = useRef(null);
-  const videoId = "_L_kjyJkgwk";
+  const videoId = "HbrQv2tIQfI";
   // const { videoId } = useParams();
 
   useEffect(() => {
@@ -67,7 +67,6 @@ const AnalyticsPage = () => {
             veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
           };
 
-          // 최신 10개 데이터 유지
           const updatedData = [...prevData, newEmotion];
           return updatedData; // return updatedData.length > 10 ? updatedData.slice(-10) : updatedData;
         });

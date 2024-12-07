@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: live-on-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: live-on-fe
+  template:
+    metadata:
+      labels:
+        app: live-on-fe
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: live-on-fe
+        image: 615299753054.dkr.ecr.us-east-1.amazonaws.com/live_on_fe:latest
+        ports:
+          - containerPort: 80
+            name: http
+        env: # React 환경 변수가 빌드에 영향을 주지 않는다면 제거 가능
+        - name: REACT_APP_CHATTING_URL
+          value: "http://sse-spring-app-service:8080"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 60
