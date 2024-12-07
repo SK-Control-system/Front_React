@@ -65,6 +65,7 @@ function App() {
   ];
 
   return (
+
     <UserProvider>
       <WebSocketProvider>
         <Router>
@@ -76,13 +77,13 @@ function App() {
               element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
             />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
             <Route
               path="/livebroadcast"
               element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
             />
             {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
             <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
-
           </Routes>
         </Router>
       </WebSocketProvider>
