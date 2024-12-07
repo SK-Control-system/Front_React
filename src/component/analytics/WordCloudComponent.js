@@ -3,7 +3,7 @@ import axios from "axios";
 import WordCloud from "wordcloud";
 import "./WordCloudComponent.css";
 
-const WordCloudComponent = ({ date, videoId }) => {
+const WordCloudComponent = ({ currentDate, videoId }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -27,8 +27,9 @@ const WordCloudComponent = ({ date, videoId }) => {
       const ctx = canvas.getContext("2d");
       ctx.scale(dpr, dpr); // DPI 보정
 
-      const currentDate = "2024-12-07"; // 현재 날짜
-      const videoId = "V3LrXor2WwQ"; // 비디오 ID
+      // const currentDate = "2024-12-07"; // 현재 날짜
+      // const videoId = "V3LrXor2WwQ"; // 비디오 ID
+      //tab.js에서 props로 currentDate와 videoID 받아오기로 로직수정.
 
       try {
         // API 요청
@@ -54,6 +55,7 @@ const WordCloudComponent = ({ date, videoId }) => {
             },
           }
         );
+        console.log("currentDate:", currentDate, "videoId:", videoId);
 
         // 응답 데이터 파싱
         const wordList = response.data.map((item) => [item.key, item.doc_count]);
@@ -61,8 +63,8 @@ const WordCloudComponent = ({ date, videoId }) => {
         // WordCloud 생성
         WordCloud(canvas, {
           list: wordList,
-          gridSize: Math.max(8, Math.floor(containerWidth / 50)), // 단어 간격
-          weightFactor: Math.min(containerWidth, containerHeight) / 50, // 단어 크기 비율
+          gridSize: Math.max(8, Math.floor(containerWidth / 100)), // 단어 간격
+          weightFactor: Math.min(containerWidth, containerHeight) / 70, // 단어 크기 비율
           fontFamily: "NanumSquare Neo OTF, sans-serif",
           color: () => `#${Math.floor(Math.random() * 16777215).toString(16)}`, // 랜덤 색상
           rotationSteps: 5, // 회전 각도
@@ -75,7 +77,7 @@ const WordCloudComponent = ({ date, videoId }) => {
     };
 
     fetchDataAndRenderWordCloud();
-  }, [date, videoId]); // date와 videoId가 변경될 때마다 호출
+  }, [currentDate, videoId]); // date와 videoId가 변경될 때마다 호출
 
   return (
     <canvas
