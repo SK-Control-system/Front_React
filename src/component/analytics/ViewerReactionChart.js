@@ -37,15 +37,13 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
     const fetchSentimentAndEmotionData = async () => {
       try {
         setLoading(true);
-
+  
         // 긍/부정 데이터 요청
         const sentimentResponse = await axios.post(
-          `/api/es/chatting/search/sentiment?index=chatting_youtube_${currentDate}&videoid=${videoId}`,
-          { query: { match_all: {} } }
+          `/api/es/chatting/search/sentiment?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
-
+  
         const sentiments = sentimentResponse.data || []; // 응답이 없을 경우 빈 배열로 처리
-
         const sentimentCounts = {
           veryPositive: 0,
           positive: 0,
@@ -53,7 +51,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           negative: 0,
           veryNegative: 0,
         };
-
+  
         if (sentiments.length > 0) {
           sentiments.forEach((sentiment) => {
             switch (sentiment) {
@@ -71,12 +69,12 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
                 break;
               case "매우 부정":
                 sentimentCounts.veryNegative += 1;
-                break;
+                break; 
               default:
                 break;
             }
           });
-
+  
           const totalSentiments = sentiments.length || 1;
           setDoughnutStats({
             veryPositive: (sentimentCounts.veryPositive / totalSentiments).toFixed(2),
@@ -84,26 +82,56 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
             neutral: (sentimentCounts.neutral / totalSentiments).toFixed(2),
             negative: (sentimentCounts.negative / totalSentiments).toFixed(2),
             veryNegative: (sentimentCounts.veryNegative / totalSentiments).toFixed(2),
+            
           });
         }
-
+  
         // 감성 분석 데이터 요청
         const emotionResponse = await axios.post(
-          `/api/es/chatting/search/emotion?index=chatting_youtube_${currentDate}&videoid=${videoId}`,
-          { query: { match_all: {} } }
+          `/api/es/chatting/search/emotion?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
-
-        const emotions = emotionResponse.data || [{}];
-        const emotionData = emotions[0] || {};
-
-        setEmotionStats({
-          joy: emotionData.joy || 0,
-          sadness: emotionData.sadness || 0,
-          anger: emotionData.anger || 0,
-          disgust: emotionData.disgust || 0,
-          surprise: emotionData.surprise || 0,
-        });
-
+  
+        const emotions = emotionResponse.data || []; // 배열 형태의 감정 데이터
+  
+        const emotionCounts = {
+          joy: 0,
+          sadness: 0,
+          anger: 0,
+          disgust: 0,
+          surprise: 0,
+          confusion: 0, // 혼란 추가
+        };
+        
+        if (emotions.length > 0) {
+          emotions.forEach((emotion) => {
+            switch (emotion) {
+              case "기쁨":
+                emotionCounts.joy += 1;
+                break;
+              case "슬픔":
+                emotionCounts.sadness += 1;
+                break;
+              case "분노":
+                emotionCounts.anger += 1;
+                break;
+              case "혐오":
+                emotionCounts.disgust += 1;
+                break;
+              case "놀람":
+                emotionCounts.surprise += 1;
+                break;
+              case "혼란":
+                emotionCounts.confusion += 1; // 혼란 처리
+                break;
+              default:
+                console.warn("알 수 없는 감정 데이터:", emotion);
+                break;
+            }
+          });
+        
+          setEmotionStats(emotionCounts);
+        }
+  
         setLoading(false);
       } catch (err) {
         console.error("데이터 가져오기 실패:", err);
@@ -111,7 +139,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
         setLoading(false);
       }
     };
-
+  
     fetchSentimentAndEmotionData();
   }, [currentDate, videoId]);
 
@@ -153,7 +181,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
 
   // PolarArea Chart 데이터
   const polarAreaData = {
-    labels: ["기쁨", "슬픔", "분노", "혐오", "놀람"],
+    labels: ["기쁨", "슬픔", "분노", "혐오", "놀람", "혼란"],
     datasets: [
       {
         data: [
@@ -162,6 +190,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           emotionStats.anger,
           emotionStats.disgust,
           emotionStats.surprise,
+          emotionStats.confusion, // 혼란 추가
         ],
         backgroundColor: [
           "#3B82F6", // Blue
@@ -169,6 +198,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           "#EAB308", // Yellow
           "#F97316", // Orange
           "#EF4444", // Red
+          "#9CA3AF", // Gray for 혼란
         ],
         borderWidth: 1,
       },
