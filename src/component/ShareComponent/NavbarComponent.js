@@ -10,9 +10,7 @@ import "./NavbarComponent.css";
 
 function NavbarComponent() {
   const { userId, setUserId } = useUser();
-
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-
 
   const handleGoogleLogin = async () => {
     sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
@@ -39,16 +37,18 @@ function NavbarComponent() {
             <Nav.Link as={Link} to="/livebroadcast">라이브 방송목록</Nav.Link>
             <Nav.Link as={Link} to="/channel">채널 통계</Nav.Link>
           </Nav>
-          <div className="sub-buttons">
-            <button className="sub-btn" onClick={toggleSubscriptionModal}>
-              구독 추가
-            </button>
-          </div>
+
           <div className="auth-buttons">
             {userId ? (
-              <button className="auth-btn logout-btn" onClick={handleLogout}>
-                로그아웃
-              </button>
+              <div className="sub-buttons">
+                <button className="sub-btn" onClick={toggleSubscriptionModal}>
+                  구독 추가
+                </button>
+
+                <button className="auth-btn logout-btn" onClick={handleLogout}>
+                  로그아웃
+                </button>
+              </div>
             ) : (
               <button className="auth-btn login-btn" onClick={handleGoogleLogin}>
                 로그인

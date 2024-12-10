@@ -13,34 +13,34 @@ export default function OAuth2RedirectHandler(){
     console.log("로그인 파라미터 확인:", { id, channelId, token });
 
     useEffect(() =>{
-        console.log("로컬스토리지 설정 시작");
+        console.log("세션스토리지 설정 시작");
         
         try {
             if(id) {
-                localStorage.setItem("userId", id);
+                sessionStorage.setItem("userId", id);
                 setUserId(id);
                 console.log("userId 저장 완료:", id);
             }
             
             if(channelId) {
-                localStorage.setItem("userChannelId", channelId);
+                sessionStorage.setItem("userChannelId", channelId);
                 setUserChannelId(channelId);
                 console.log("channelId 저장 완료:", channelId);
             }
             
             if(token) {
-                localStorage.setItem("token", token);
+                sessionStorage.setItem("token", token);
                 setToken(token);                
                 console.log("token 저장 완료:", token);
             }
 
-            console.log("로컬스토리지 최종 상태:", {
-                savedUserId: localStorage.getItem("userId"),
-                savedChannelId: localStorage.getItem("userChannelId"),
-                savedToken: localStorage.getItem("token")
+            console.log("세션스토리지 최종 상태:", {
+                savedUserId: sessionStorage.getItem("userId"),
+                savedChannelId: sessionStorage.getItem("userChannelId"),
+                savedToken: sessionStorage.getItem("token")
             });
         } catch (error) {
-            console.error("로컬스토리지 저장 중 에러:", error);
+            console.error("세션스토리지 저장 중 에러:", error);
         }
 
         const redirectUrl = sessionStorage.getItem('loginRedirectUrl') || '/';

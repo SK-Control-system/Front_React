@@ -7,9 +7,8 @@
 
 .modal-header {
   border-bottom: 1px solid rgba(34, 34, 38, 0.08);
-  background-color: #303030;
-
-  color: #f8f9fa;
+  background-color: #2e2e2e;
+  color: #ffffff;
 }
 
 .modal-title {
@@ -17,17 +16,101 @@
   font-size: 16px;
 }
 
-.modal-body{
-  background-color: #3b3b3b;
-  color: #f8f9fa;
+.modal-body {
+  background-color: #3c3c3c;
+  color: #ffffff;
 }
 
 .modal-footer {
   border-top: 1px solid rgba(34, 34, 38, 0.08);
-  background-color: #303030;
-
+  background-color: #2e2e2e;
 }
 
 .modal-footer .btn {
   border-radius: 8px;
+  color: #ffffff;
+  background-color: #6a6a6a;
+  border: none;
+}
+
+.modal-footer .btn:hover {
+  background-color: #5a5a5a;
+}
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* 채널 아이템 스타일 */
+.channel-item {
+  display: flex;
+  padding: 10px;
+  border: 1px solid #666666;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #4a4a4a;
+}
+
+.channel-item:hover {
+  background-color: #5a5a5a;
+}
+
+.channel-thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.channel-info {
+  flex: 1;
+  overflow: visible;
+}
+
+.channel-info h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+/* 채널 설명을 흰색으로 변경 */
+.channel-info p.text-muted {
+  font-size: 0.875rem;
+  color: #ffffff !important; 
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* 검색 폼 스타일 수정 */
+.search-form-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-form-group .form-control {
+  flex: 1;
+  background-color: #5a5a5a;
+  border-color: #5a5a5a;
+  color: #ffffff;
+}
+
+.search-form-group .form-control::placeholder {
+  color: #cccccc;
+}
+
+.search-form-group .btn {
+  width: auto;
+  white-space: nowrap;
+  background-color: #6a6a6a;
+  color: #ffffff;
+  border: none;
+}
+
+.search-form-group .btn:hover {
+  background-color: #5a5a5a;
 }

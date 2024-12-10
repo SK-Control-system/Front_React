@@ -8,9 +8,9 @@ export const UserProvider = ({children}) =>{
     const [token, setToken] = useState(null);
 
     useEffect(() => {
-        const storedUserId = localStorage.getItem("userId");
-        const storedUserChannelId = localStorage.getItem("userChannelId");
-        const storedToken = localStorage.getItem("token");
+        const storedUserId = sessionStorage.getItem("userId");
+        const storedUserChannelId = sessionStorage.getItem("userChannelId");
+        const storedToken = sessionStorage.getItem("token");
 
         if(storedUserId) {
             setUserId(storedUserId);
