@@ -4,12 +4,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import './Subscription.css';
+import { useUser } from '../../provider/UserContext';
 
 function Subscription({ show, onHide }) {
   const [channelId, setChannelId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { userId, token } = useUser();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -39,6 +41,27 @@ function Subscription({ show, onHide }) {
     setSearchResults([]); // 검색 결과 초기화
   };
 
+  const handleSubscription = async () => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_POD_URL}/register`, 
+        {
+          channelId: channelId,
+          userId: userId
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      alert('구독이 추가되었습니다!');
+    } catch (error) {
+      console.error('구독 요청 중 오류 발생:', error);
+      alert('구독 요청에 실패했습니다.');
+    }
+  };
+
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
@@ -47,8 +70,8 @@ function Subscription({ show, onHide }) {
       <Modal.Body>
         <Form className="mb-4">
           <Form.Group controlId="channelIdInput">
-            <Form.Control 
-              type="text" 
+            <Form.Control
+              type="text"
               placeholder="구독할 유튜브 채널 ID를 입력하세요"
               value={channelId}
               onChange={(e) => setChannelId(e.target.value)}
@@ -102,7 +125,7 @@ function Subscription({ show, onHide }) {
           variant="primary"
           onClick={() => {
             if (channelId) {
-              alert('구독이 추가되었습니다!');
+              handleSubscription();
               onHide();
             } else {
               alert('채널 ID를 입력하거나 선택해주세요.');
