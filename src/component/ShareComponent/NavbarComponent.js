@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -9,12 +10,14 @@ import "./NavbarComponent.css";
 
 function NavbarComponent() {
   const { userId, setUserId } = useUser();
+
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
-  const handleGoogleLogin = () => {
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.prompt();
-    }
+
+  const handleGoogleLogin = async () => {
+    sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
+    console.log(sessionStorage.getItem('loginRedirectUrl'));
+    window.location.href = `${process.env.REACT_APP_API_POD_URL}/oauth2/authorization/google`;
   };
 
   const handleLogout = () => {
