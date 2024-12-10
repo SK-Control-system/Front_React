@@ -1,34 +1,54 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useUser } from "./UserContext";
 
 // WebSocket Context 생성
 const WebSocketContext = createContext(null);
 
-export const WebSocketProvider = ({ userId, children }) => {
+export const WebSocketProvider = ({ children }) => {
+  const { userId } = useUser();
+
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState(null); // 백엔드에서 온 메시지 저장
 
   useEffect(() => {
     if (!userId) {
-      console.error("userId가 필요합니다.");
+      console.error("userId 없음");
       return;
     }
 
     // WebSocket 연결
     const ws = new WebSocket(
-      `wss://${process.env.REACT_APP_API_POD_URL}/ws/notifications?userId=${userId}`
+      `wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
     );
 
     ws.onopen = () => console.log("WebSocket connected");
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("Message from server:", data);
+    
+    // 에러 핸들러 추가
+    ws.onerror = (error) => {
+      console.error("WebSocket 연결 에러:", error);
+    };
 
-      // 특정 신호 처리
-      if (data.type === "alert") {
-        setMessage(data.message); // 백엔드에서 온 알림 메시지 저장
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("Message from server:", data);
+
+        if (data.type === "alert") {
+          setMessage(data.message);
+        }
+      } catch (error) {
+        console.error("WebSocket 메시지 처리 중 에러:", error);
       }
     };
-    ws.onclose = () => console.log("WebSocket disconnected");
+
+    ws.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(`WebSocket 연결 정상 종료 (코드: ${event.code}, 사유: ${event.reason})`);
+      } else {
+        console.error("WebSocket 연결이 비정상적으로 종료됨");
+      }
+    };
+
     setSocket(ws);
 
     // 컴포넌트 언마운트 시 WebSocket 닫기

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -9,53 +8,10 @@ import "./NavbarComponent.css"
 function NavbarComponent() {
   const { userId, setUserId } = useUser();
 
-  useEffect(() => {
-    // 스크립트 로드 완료 확인을 위한 함수
-    const initializeGoogleSignIn = () => {
-      if (window.google) {
-        try {
-          window.google.accounts.id.initialize({
-            client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse
-          });
-        } catch (error) {
-          console.error('Google Sign-In 초기화 오류:', error);
-        }
-      }
-    };
-
-    // 스크립트 로드 상태 확인
-    if (document.readyState === 'complete') {
-      initializeGoogleSignIn();
-    } else {
-      window.addEventListener('load', initializeGoogleSignIn);
-      return () => window.removeEventListener('load', initializeGoogleSignIn);
-    }
-  }, []);
-
-  const handleCredentialResponse = async (response) => {
-    try {
-      // 백엔드 API 호출
-      const res = await fetch(`https://${process.env.REACT_APP_BACKEND_POD_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${response.credential}`,
-        },
-      });
-      const data = await res.json();
-
-      localStorage.setItem('userId', data.body.userId);
-      setUserId(data.body.userId);
-    } catch (error) {
-      console.error('로그인 중 오류 발생:', error);
-    }
-  };
-
-  const handleGoogleLogin = () => {
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.prompt();
-    }
+  const handleGoogleLogin = async () => {
+    sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
+    console.log(sessionStorage.getItem('loginRedirectUrl'));
+    window.location.href = `${process.env.REACT_APP_BACKEND_POD_URL}/oauth2/authorization/google`;
   };
 
   const handleLogout = () => {
