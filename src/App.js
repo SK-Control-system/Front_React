@@ -8,10 +8,11 @@ import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
-import { UserProvider } from "./provider/UserContext";
 import { WebSocketProvider } from "./provider/WebSocketContext";
+import OAuth2RedirectHandler from "./redirection/OAuth2RedirectHandler";
 
 function App() {
+
   const stats = {
     totalViewers: 72131,
     avgViewers: 36111,
@@ -65,28 +66,26 @@ function App() {
   ];
 
   return (
-    <UserProvider>
-      <WebSocketProvider>
-        <Router>
-          <NavbarComponent />
-          <SideBar />
-          <Routes>
-            <Route
-              path="/"
-              element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
-            />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route
-              path="/livebroadcast"
-              element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
-            />
-            {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
-            <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
-
-          </Routes>
-        </Router>
-      </WebSocketProvider>
-    </UserProvider>
+    <WebSocketProvider>
+      <Router>
+        <NavbarComponent />
+        <SideBar />
+        <Routes>
+          <Route
+            path="/"
+            element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
+          />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route
+            path="/livebroadcast"
+            element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
+          />
+          {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
+          <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+          <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
+        </Routes>
+      </Router>
+    </WebSocketProvider>
   );
 }
 
