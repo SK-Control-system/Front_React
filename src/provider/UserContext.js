@@ -12,9 +12,15 @@ export const UserProvider = ({children}) =>{
         const storedUserChannelId = localStorage.getItem("userChannelId");
         const storedToken = localStorage.getItem("token");
 
-        if(storedUserId && storedUserChannelId && storedToken){
+        if(storedUserId) {
             setUserId(storedUserId);
+        }
+        
+        if(storedUserChannelId) {
             setUserChannelId(storedUserChannelId);
+        }
+        
+        if(storedToken) {
             setToken(storedToken);
         }
     }, []);
