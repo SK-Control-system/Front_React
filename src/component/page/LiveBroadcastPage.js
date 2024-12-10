@@ -3,11 +3,11 @@ import axios from "axios";
 import "./LiveBroadcastPage.css";
 import { Link } from "react-router-dom";
 
-const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, videoThumbnailUrl, channelThumbnailUrl, actualStartTime, stats, videoId }) => {
+const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, videoThumbnailUrl, channelThumbnailUrl, actualStartTime, stats, videoId, currentDate }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link to={`/channel/${videoId}`} className="live-broadcast-card-link">
+    <Link to={`/analytics/${currentDate}/${videoId}`} className="live-broadcast-card-link">
       <div
         className="live-broadcast-card"
         onMouseEnter={() => setIsHovered(true)}
@@ -128,25 +128,32 @@ const LiveBroadcastPage = () => {
               className="live-broadcast-list"
               ref={(el) => (scrollRefs.current[category] = el)}
             >
-              {groupedData[category].map((broadcast, idx) => (
-                <BroadcastCard
-                  key={idx}
-                  videoId={broadcast.videoId}
-                  videoTitle={broadcast.videoTitle}
-                  channelTitle={broadcast.channelTitle}
-                  concurrentViewers={broadcast.concurrentViewers}
-                  category={broadcast.category}
-                  videoThumbnailUrl={broadcast.videoThumbnailUrl}
-                  channelThumbnailUrl={broadcast.channelThumbnailUrl}
-                  actualStartTime={broadcast.actualStartTime}
-                  stats={{
-                    likes: broadcast.likeCount,
-                    comments: 450,
-                    positiveReactions: "80%",
-                    averageViewTime: "15분",
-                  }}
-                />
-              ))}
+              {groupedData[category].map((broadcast, idx) => {
+                const currentDate = broadcast.videoAPIReceivedTime
+                ? broadcast.videoAPIReceivedTime.split(" ")[0]
+                : "unknown";  //날짜만추출
+              
+                return (
+                  <BroadcastCard
+                    key={idx}
+                    videoId={broadcast.videoId}
+                    videoTitle={broadcast.videoTitle}
+                    channelTitle={broadcast.channelTitle}
+                    concurrentViewers={broadcast.concurrentViewers}
+                    category={broadcast.category}
+                    videoThumbnailUrl={broadcast.videoThumbnailUrl}
+                    channelThumbnailUrl={broadcast.channelThumbnailUrl}
+                    actualStartTime={broadcast.actualStartTime}
+                    currentDate={currentDate} // 날짜 전달
+                    stats={{
+                      likes: broadcast.likeCount,
+                      comments: 450,
+                      positiveReactions: "80%",
+                      averageViewTime: "15분",
+                    }}
+                  />
+                );
+              })}
             </div>
             <button
               className="scroll-button right"

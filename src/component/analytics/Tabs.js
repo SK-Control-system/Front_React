@@ -1,33 +1,26 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
+import { useParams } from "react-router-dom";
 import "./Tabs.css"; // CSS 파일
 import ViewerReactionChart from "./ViewerReactionChart"; // ViewerReactionChart 컴포넌트
 import WordCloudComponent from "./WordCloudComponent"; // WordCloud 컴포넌트
 import LikesAndComments from "./LikesAndComments";
-const ViewerReaction = () => {
-  const mockData = {
-    veryPositive: 30,
-    positive: 50,
-    neutral: 20,
-    negative: 15,
-    veryNegative: 10,
-  };
 
-  return <ViewerReactionChart data={mockData} />;
-};
 
 
 // 탭 내용에 표시될 컴포넌트들
 
 const Tabs = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
+  const { currentDate, videoId } = useParams();
+  console.log("currentDate:", currentDate, "videoId:", videoId);
 
   // 탭에 따른 콘텐츠 렌더링
   const renderContent = () => {
     switch (activeTab) {
       case "viewerReaction":
-        return <ViewerReaction />;
+        return <ViewerReactionChart currentDate={currentDate} videoId={videoId}/>;
       case "keywordStats":
-        return <WordCloudComponent />; // WordCloud 컴포넌트 연결
+        return <WordCloudComponent currentDate={currentDate} videoId={videoId}/>; // WordCloud 컴포넌트 연결
       case "likesAndComments":
         return <LikesAndComments />;
       default:
