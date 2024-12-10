@@ -11,7 +11,7 @@ function NavbarComponent() {
   const handleGoogleLogin = async () => {
     sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
     console.log(sessionStorage.getItem('loginRedirectUrl'));
-    window.location.href = `${process.env.REACT_APP_BACKEND_POD_URL}/oauth2/authorization/google`;
+    window.location.href = `${process.env.REACT_APP_API_POD_URL}/oauth2/authorization/google`;
   };
 
   const handleLogout = () => {
