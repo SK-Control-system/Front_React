@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Tabs from "../analytics/Tabs";
 import EmotionTrendChart from "../analytics/EmotionTrendChart";
 import ChatBox from "../analytics/ChatBox";
+import { useParams } from "react-router-dom";
 
 const AnalyticsPage = () => {
   const [emotionData, setEmotionData] = useState([]);
@@ -11,8 +12,7 @@ const AnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
   const eventSourceRef = useRef(null);
-  const videoId = "vvxWkBqBQQs";
-  // const { videoId } = useParams();
+  const { videoId } = useParams();
 
   useEffect(() => {
     // 로컬 스토리지 초기화

@@ -25,7 +25,8 @@ function ViewerCategoryStats() {
         const response = await axios.get("/api/redis/get/hash/videoId");
         const rawData = Object.values(response.data)
           .map((item) => JSON.parse(item))
-          .filter((video) => video.concurrentViewers); // 빈 데이터 필터링
+          // 카테고리가 'n'이 아니면서 concurrentViewers가 존재하는 것만 필터링
+          .filter((video) => video.concurrentViewers && video.category !== 'n');
 
         const categoryCounts = rawData.reduce((acc, video) => {
           const category = video.category || "기타";
@@ -49,7 +50,8 @@ function ViewerCategoryStats() {
 
         const rawData = fallbackData
           .map((item) => (item !== "{}" ? JSON.parse(item) : {}))
-          .filter((video) => video.concurrentViewers); // 빈 데이터 필터링
+          // fallbackData에서 'n' 카테고리 제외
+          .filter((video) => video.concurrentViewers && video.category !== 'n');
 
         const categoryCounts = rawData.reduce((acc, video) => {
           const category = video.category || "기타";
