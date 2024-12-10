@@ -19,7 +19,7 @@ function NavbarComponent() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("userId");
+    sessionStorage.removeItem("userId");
     setUserId(null);
   };
 
