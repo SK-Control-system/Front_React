@@ -18,7 +18,7 @@ export const WebSocketProvider = ({ children }) => {
 
     // WebSocket 연결
     const ws = new WebSocket(
-      `wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
+      `ws://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
     );
 
     ws.onopen = () => console.log("WebSocket connected");
