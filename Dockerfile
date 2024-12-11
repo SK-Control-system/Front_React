@@ -22,7 +22,6 @@ RUN npm config set fetch-retries 5 \
 COPY . /app
 
 # Build React app
-ENV REACT_APP_CHATTING_URL=http://sse-spring-app-service:8080
 RUN npm run build
 
 # Nginx for serving the built application
