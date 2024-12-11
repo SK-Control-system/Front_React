@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/components/AnalyticsPage.js
+import React, { useEffect, useState } from "react";
 import Tabs from "../analytics/Tabs";
 import EmotionTrendChart from "../analytics/EmotionTrendChart";
 import ChatBox from "../analytics/ChatBox";
 import { useParams } from "react-router-dom";
+import useSSE from "../../hook/UseSSE";
 
 const AnalyticsPage = () => {
   const [emotionData, setEmotionData] = useState([]);
@@ -11,7 +13,6 @@ const AnalyticsPage = () => {
   const [totalChatCount, setTotalChatCount] = useState(0); // 채팅 총 갯수
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
-  const eventSourceRef = useRef(null);
   const { currentDate, videoId } = useParams();
 
   useEffect(() => {
@@ -29,23 +30,17 @@ const AnalyticsPage = () => {
     if (storedChatData) {
       let parsedData = JSON.parse(storedChatData);
 
-      // 데이터 구조 변환: 기존 데이터에 items 배열이 있는지 확인하고 sentiment를 최상위로 이동
-      const transformedData = parsedData.map((chat) => {
-        if (chat.items && chat.items[0] && chat.items[0].sentiment) {
-          return {
-            ...chat,
-            sentiment: chat.items[0].sentiment,
-          };
-        }
-        return chat;
-      });
-
-      setChatData(transformedData);
-      setTotalChatCount(transformedData.length);
+      setChatData(parsedData);
+      setTotalChatCount(parsedData.length);
 
       // emotionData 초기 설정: chatTime을 기준으로 감정 데이터 설정
-      const initialEmotionData = transformedData.map((chat) => {
-        const sentiment = chat.sentiment || { label: "중립", confidence: 0, scores: { positive: 0, negative: 0, neutral: 1 } };
+      const initialEmotionData = parsedData.map((chat) => {
+        const sentiment =
+          chat.sentiment || {
+            label: "중립",
+            confidence: 0,
+            scores: { positive: 0, negative: 0, neutral: 1 },
+          };
         return {
           time: chat.chatTime,
           veryPositive: sentiment.label === "매우 긍정" ? 1 : 0,
@@ -57,71 +52,112 @@ const AnalyticsPage = () => {
       });
 
       setEmotionData(initialEmotionData);
-
-      // 변환된 데이터를 다시 로컬 스토리지에 저장
-      localStorage.setItem(`chatData_${videoId}`, JSON.stringify(transformedData));
     } else {
       // videoId에 해당하는 데이터가 없으면 초기화
       setChatData([]);
       setTotalChatCount(0);
       setEmotionData([]);
     }
-
-    // SSE 연결 시작
-    eventSourceRef.current = new EventSource(`${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId}`);
-
-    eventSourceRef.current.onmessage = (event) => {
-      try {
-        const newChat = JSON.parse(event.data);
-
-        // sentiment가 없으면 기본값 설정
-        const validatedChat = {
-          ...newChat,
-          sentiment: newChat.sentiment || { label: "중립", confidence: 0, scores: { positive: 0, negative: 0, neutral: 1 } },
-        };
-
-        setChatData((prevChats) => {
-          const updatedChats = [...prevChats, validatedChat];
-          // 로컬 스토리지 업데이트
-          localStorage.setItem(`chatData_${videoId}`, JSON.stringify(updatedChats));
-          return updatedChats;
-        });
-
-        // 채팅 총 갯수 업데이트
-        setTotalChatCount((prevCount) => prevCount + 1);
-
-        // 긍부정 데이터 업데이트: chatTime을 사용하여 x축 설정
-        const { sentiment, chatTime } = validatedChat;
-        setEmotionData((prevData) => {
-          const newEmotion = {
-            time: chatTime,
-            veryPositive: sentiment.label === "매우 긍정" ? 1 : 0,
-            positive: sentiment.label === "긍정" ? 1 : 0,
-            neutral: sentiment.label === "중립" ? 1 : 0,
-            negative: sentiment.label === "부정" ? 1 : 0,
-            veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
-          };
-          const updatedData = [...prevData, newEmotion];
-          return updatedData;
-        });
-
-      } catch (error) {
-        console.error("SSE 데이터 처리 오류", error);
-      }
-    };
-
-    eventSourceRef.current.onerror = (error) => {
-      console.error("SSE 연결 오류", error);
-      eventSourceRef.current.close();
-    };
-
-    // 컴포넌트 언마운트 시 SSE 연결 종료
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-    };
   }, [videoId]);
+
+  // SSE 메시지 핸들러 - 초기 데이터 처리
+  const handleInitialData = (bulkChats) => {
+    // 중복 방지를 위해 기존 chatData에 없는 채팅만 추가
+    const newChats = bulkChats.filter(
+      (chat) =>
+        !chatData.some(
+          (existingChat) =>
+            existingChat.chatTime === chat.chatTime &&
+            existingChat.message === chat.message
+        )
+    );
+
+    if (newChats.length > 0) {
+      setChatData((prevChats) => {
+        const updatedChats = [...prevChats, ...newChats];
+        localStorage.setItem(`chatData_${videoId}`, JSON.stringify(updatedChats));
+        return updatedChats;
+      });
+
+      setTotalChatCount((prevCount) => prevCount + newChats.length);
+
+      // emotionData 업데이트
+      const newEmotion = newChats.map((chat) => {
+        const sentiment =
+          chat.sentiment || {
+            label: "중립",
+            confidence: 0,
+            scores: { positive: 0, negative: 0, neutral: 1 },
+          };
+        return {
+          time: chat.chatTime,
+          veryPositive: sentiment.label === "매우 긍정" ? 1 : 0,
+          positive: sentiment.label === "긍정" ? 1 : 0,
+          neutral: sentiment.label === "중립" ? 1 : 0,
+          negative: sentiment.label === "부정" ? 1 : 0,
+          veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
+        };
+      });
+
+      setEmotionData((prevData) => [...prevData, ...newEmotion]);
+    }
+  };
+
+  // SSE 메시지 핸들러 - 실시간 메시지 처리
+  const handleMessage = (newChat) => {
+    // 중복 방지를 위해 기존에 동일한 채팅이 있는지 확인
+    const isDuplicate = chatData.some(
+      (chat) =>
+        chat.chatTime === newChat.chatTime && chat.message === newChat.message
+    );
+
+    if (!isDuplicate) {
+      const validatedChat = {
+        ...newChat,
+        sentiment:
+          newChat.sentiment || {
+            label: "중립",
+            confidence: 0,
+            scores: { positive: 0, negative: 0, neutral: 1 },
+          },
+      };
+
+      setChatData((prevChats) => {
+        const updatedChats = [...prevChats, validatedChat];
+        localStorage.setItem(`chatData_${videoId}`, JSON.stringify(updatedChats));
+        return updatedChats;
+      });
+
+      setTotalChatCount((prevCount) => prevCount + 1);
+
+      // emotionData 업데이트
+      const { sentiment, chatTime } = validatedChat;
+      const newEmotion = {
+        time: chatTime,
+        veryPositive: sentiment.label === "매우 긍정" ? 1 : 0,
+        positive: sentiment.label === "긍정" ? 1 : 0,
+        neutral: sentiment.label === "중립" ? 1 : 0,
+        negative: sentiment.label === "부정" ? 1 : 0,
+        veryNegative: sentiment.label === "매우 부정" ? 1 : 0,
+      };
+
+      setEmotionData((prevData) => [...prevData, newEmotion]);
+    }
+  };
+
+  // SSE 오류 핸들러
+  const handleError = (error) => {
+    console.error("최종 SSE 연결 오류:", error);
+    // 추가적인 오류 처리 로직 (예: 사용자 알림)
+  };
+
+  // Custom Hook 사용 - 초기 데이터와 실시간 메시지 처리
+  useSSE(
+    `${process.env.REACT_APP_CHATTING_URL}/stream?videoId=${videoId}`,
+    handleInitialData, // 초기 데이터 핸들러
+    handleMessage, // 실시간 메시지 핸들러
+    handleError
+  );
 
   useEffect(() => {
     // 검색 필터링
@@ -155,7 +191,12 @@ const AnalyticsPage = () => {
       </div>
       <div className="우측">
         <EmotionTrendChart data={emotionData} />
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} currentDate={currentDate} videoId={videoId} />
+        <Tabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          currentDate={currentDate}
+          videoId={videoId}
+        />
       </div>
     </div>
   );
