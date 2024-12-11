@@ -19,9 +19,6 @@ spec:
         ports:
           - containerPort: 80
             name: http
-        env: # React 환경 변수가 빌드에 영향을 주지 않는다면 제거 가능
-        - name: REACT_APP_CHATTING_URL
-          value: "http://sse-spring-app-service:8080"
         readinessProbe:
           httpGet:
             path: /

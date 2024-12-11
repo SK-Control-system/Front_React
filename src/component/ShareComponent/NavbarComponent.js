@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import Subscription from './Subscription';
 import { useUser } from '../../provider/UserContext';
 import "./NavbarComponent.css";
-import axios from 'axios';
 
 function NavbarComponent() {
   const { userId, setUserId } = useUser();
