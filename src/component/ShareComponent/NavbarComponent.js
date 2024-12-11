@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Subscription from './Subscription';
 import { useUser } from '../../provider/UserContext';
 import "./NavbarComponent.css";
+import axios from 'axios';
 
 function NavbarComponent() {
   const { userId, setUserId } = useUser();
@@ -15,7 +16,8 @@ function NavbarComponent() {
   const handleGoogleLogin = async () => {
     sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
     console.log(sessionStorage.getItem('loginRedirectUrl'));
-    window.location.href = `${process.env.REACT_APP_API_POD_URL}/oauth2/authorization/google`;
+    axios.get(`${process.env.REACT_APP_REACT_APP_API_POD_URL}/login`);
+    // window.location.href = `${process.env.REACT_APP_API_POD_URL}/oauth2/authorization/google`;
   };
 
   const handleLogout = () => {

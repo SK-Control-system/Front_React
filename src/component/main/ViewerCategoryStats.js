@@ -22,7 +22,7 @@ function ViewerCategoryStats() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("/api/redis/get/hash/videoId");
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
         const rawData = Object.values(response.data)
           .map((item) => JSON.parse(item))
           // 카테고리가 'n'이 아니면서 concurrentViewers가 존재하는 것만 필터링

@@ -12,9 +12,11 @@ const AnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
   const [searchQuery, setSearchQuery] = useState("");
   const eventSourceRef = useRef(null);
-  const { videoId } = useParams();
+  const { currentDate, videoId } = useParams();
 
   useEffect(() => {
+    console.log("Video ID:", videoId);
+
     // 로컬 스토리지 초기화: 현재 videoId와 다른 데이터 삭제
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("chatData_") && key !== `chatData_${videoId}`) {
@@ -71,7 +73,6 @@ const AnalyticsPage = () => {
     eventSourceRef.current.onmessage = (event) => {
       try {
         const newChat = JSON.parse(event.data);
-        console.log(newChat);
 
         // sentiment가 없으면 기본값 설정
         const validatedChat = {
@@ -154,7 +155,7 @@ const AnalyticsPage = () => {
       </div>
       <div className="우측">
         <EmotionTrendChart data={emotionData} />
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} currentDate={currentDate} videoId={videoId} />
       </div>
     </div>
   );

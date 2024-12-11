@@ -55,7 +55,7 @@ const ChannelAnalyticsPage = () => {
     const fetchChannelData = async () => {
       try {
         // API 호출
-        const response = await axios.get("/api/redis/get/hash/videoId");
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
 
         // JSON 파싱 및 유효한 데이터 필터링
         const parsedData = response.data

@@ -26,7 +26,7 @@ function StatisticsPanel() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("/api/redis/get/hash/videoId");
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
         const rawData = Object.values(response.data)
           .map((item) => JSON.parse(item))
           .filter((video) => video.concurrentViewers || video.likeCount || video.viewCount);

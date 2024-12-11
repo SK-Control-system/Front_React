@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./ChatBox.css";
 
 const ChatBox = ({ chatData }) => {
+  const chatBoxRef = useRef(null); // 채팅창 요소에 접근하기 위한 Ref 생성
+
   const sentimentColors = {
     "매우 긍정": "#4caf50",
     "긍정": "#8bc34a",
@@ -10,15 +12,20 @@ const ChatBox = ({ chatData }) => {
     "매우 부정": "#f44336",
   };
 
-  console.log("Chat Data:", chatData);
+  useEffect(() => {
+    // 새로운 채팅이 추가될 때마다 스크롤을 최하단으로 이동
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [chatData]); // chatData가 변경될 때마다 실행
 
   return (
     <div className="chat-box">
       <h2 className="chat-header">실시간 채팅창</h2>
-      <div className="chat-messages">
+      <div className="chat-messages" ref={chatBoxRef} style={{ overflowY: "auto", maxHeight: "400px" }}>
         {chatData.map((chat) => (
           <div
-            key={`${chat.chatterChannelId}_${chat.chatTime}`}
+            key={`${chat.chatterChannelId}_${chat.chatTime}_${Math.random()}`}
             className="chat-message"
             style={{
               borderLeft: `5px solid ${
