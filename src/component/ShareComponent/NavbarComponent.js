@@ -16,7 +16,7 @@ function NavbarComponent() {
   const handleGoogleLogin = async () => {
     sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
     console.log(sessionStorage.getItem('loginRedirectUrl'));
-    axios.get(`${process.env.REACT_APP_REACT_APP_API_POD_URL}/login`);
+    axios.get(`${process.env.REACT_APP_API_POD_URL}/login`);
     // window.location.href = `${process.env.REACT_APP_API_POD_URL}/oauth2/authorization/google`;
   };
 
