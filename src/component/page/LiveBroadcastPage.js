@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, videoThumbnailUrl, channelThumbnailUrl, actualStartTime, stats, videoId, currentDate }) => {
   const [isHovered, setIsHovered] = useState(false);
+  console.log(videoId);
 
   return (
     <Link to={`/analytics/${currentDate}/${videoId}`} className="live-broadcast-card-link">
@@ -69,7 +70,7 @@ const LiveBroadcastPage = () => {
   useEffect(() => {
     const fetchBroadcastData = async () => {
       try {
-        const response = await axios.get("/api/redis/get/hash/videoId");
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
         if (!response.data) throw new Error("API에서 데이터를 받지 못했습니다.");
 
         const rawData = Object.values(response.data).map((item) => {

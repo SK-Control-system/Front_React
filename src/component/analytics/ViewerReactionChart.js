@@ -40,7 +40,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
   
         // 긍/부정 데이터 요청
         const sentimentResponse = await axios.post(
-          `/api/es/chatting/search/sentiment?index=chatting_youtube_${currentDate}&videoid=${videoId}`
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/chatting/search/sentiment?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
   
         const sentiments = sentimentResponse.data || []; // 응답이 없을 경우 빈 배열로 처리
@@ -88,7 +88,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
   
         // 감성 분석 데이터 요청
         const emotionResponse = await axios.post(
-          `/api/es/chatting/search/emotion?index=chatting_youtube_${currentDate}&videoid=${videoId}`
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/chatting/search/emotion?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
   
         const emotions = emotionResponse.data || []; // 배열 형태의 감정 데이터

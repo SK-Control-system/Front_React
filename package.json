@@ -47,6 +47,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://a891c53f319454681b87fd275e49a906-509478675.us-east-1.elb.amazonaws.com:8888"
+  }
 }

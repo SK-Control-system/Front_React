@@ -34,7 +34,7 @@ const WordCloudComponent = ({ currentDate, videoId }) => {
       try {
         // API 요청
         const response = await axios.post(
-          `/api/es/chatting/wordCloud?index=chatting_youtube_${currentDate}&videoid=${videoId}`,
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/chatting/wordCloud?index=chatting_youtube_${currentDate}&videoid=${videoId}`,
           {
             size: 0,
             query: {
