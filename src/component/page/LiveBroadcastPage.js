@@ -2,10 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./LiveBroadcastPage.css";
 import { Link } from "react-router-dom";
+import { PlusCircle } from "lucide-react";
+import Subscription from "../ShareComponent/Subscription";
 
-const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, videoThumbnailUrl, channelThumbnailUrl, actualStartTime, stats, videoId, currentDate }) => {
+const BroadcastCard = ({
+  videoTitle,
+  channelTitle,
+  concurrentViewers,
+  category,
+  videoThumbnailUrl,
+  channelThumbnailUrl,
+  actualStartTime,
+  stats,
+  videoId,
+  currentDate,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
-  console.log(videoId);
 
   return (
     <Link to={`/analytics/${currentDate}/${videoId}`} className="live-broadcast-card-link">
@@ -61,16 +73,60 @@ const BroadcastCard = ({ videoTitle, channelTitle, concurrentViewers, category, 
   );
 };
 
+const SubscribeChannelCard = ({ onAddChannel }) => {
+  return (
+    <div
+      className="live-broadcast-card subscribe-channel-card"
+      onClick={onAddChannel}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        cursor: "pointer",
+      }}
+    >
+      <div
+        style={{
+          textAlign: "center",
+          color: "#9a9a9a",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <PlusCircle size={48} color="#ffffff" />
+        <span style={{ fontSize: "14px" }}>채널 추가하기</span>
+      </div>
+    </div>
+  );
+};
+
 const LiveBroadcastPage = () => {
   const [groupedData, setGroupedData] = useState({});
+  const [subscribedChannels, setSubscribedChannels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scrollRefs = useRef({});
 
   useEffect(() => {
+    const fetchSubscribedChannels = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/subscribed-channels`
+        );
+        setSubscribedChannels(response.data);
+      } catch (err) {
+        console.error("구독 채널 데이터 불러오기 실패:", err);
+      }
+    };
+
     const fetchBroadcastData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`
+        );
         if (!response.data) throw new Error("API에서 데이터를 받지 못했습니다.");
 
         const rawData = Object.values(response.data).map((item) => {
@@ -101,8 +157,13 @@ const LiveBroadcastPage = () => {
       }
     };
 
+    fetchSubscribedChannels();
     fetchBroadcastData();
   }, []);
+
+  const toggleSubscriptionModal = () => {
+    setShowSubscriptionModal(!showSubscriptionModal);
+  };
 
   const scroll = (category, direction) => {
     const scrollElement = scrollRefs.current[category];
@@ -117,6 +178,38 @@ const LiveBroadcastPage = () => {
 
   return (
     <div className="live-broadcast-page">
+      {/* 구독 채널 섹션 */}
+      <div className="live-broadcast-category-section">
+        <h2 className="live-broadcast-category-title">내 구독 목록</h2>
+        <div className="live-broadcast-list-container">
+          <button
+            className="scroll-button left"
+            onClick={() => scroll("내 구독 목록", "left")}
+          >
+            ◀
+          </button>
+          <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
+            {subscribedChannels.map((channel, idx) => (
+              <BroadcastCard
+                key={idx}
+                videoTitle={channel.channelName}
+                channelTitle={channel.channelName}
+                videoThumbnailUrl={channel.channelThumbnailUrl}
+                channelThumbnailUrl={channel.channelThumbnailUrl}
+              />
+            ))}
+            <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
+          </div>
+          <button
+            className="scroll-button right"
+            onClick={() => scroll("내 구독 목록", "right")}
+          >
+            ▶
+          </button>
+        </div>
+      </div>
+
+      {/* 기존 카테고리별 방송 목록 */}
       {Object.keys(groupedData).map((category, index) => (
         <div key={index} className="live-broadcast-category-section">
           <h2 className="live-broadcast-category-title">{category}</h2>
@@ -133,9 +226,9 @@ const LiveBroadcastPage = () => {
             >
               {groupedData[category].map((broadcast, idx) => {
                 const currentDate = broadcast.videoAPIReceivedTime
-                ? broadcast.videoAPIReceivedTime.split(" ")[0]
-                : "unknown";  //날짜만추출
-              
+                  ? broadcast.videoAPIReceivedTime.split(" ")[0]
+                  : "unknown";
+
                 return (
                   <BroadcastCard
                     key={idx}
@@ -147,7 +240,7 @@ const LiveBroadcastPage = () => {
                     videoThumbnailUrl={broadcast.videoThumbnailUrl}
                     channelThumbnailUrl={broadcast.channelThumbnailUrl}
                     actualStartTime={broadcast.actualStartTime}
-                    currentDate={currentDate} // 날짜 전달
+                    currentDate={currentDate}
                     stats={{
                       likes: broadcast.likeCount,
                       comments: 450,
@@ -167,6 +260,14 @@ const LiveBroadcastPage = () => {
           </div>
         </div>
       ))}
+
+      {/* Subscription Modal */}
+      {showSubscriptionModal && (
+        <Subscription
+          show={showSubscriptionModal}
+          onHide={toggleSubscriptionModal}
+        />
+      )}
     </div>
   );
 };
