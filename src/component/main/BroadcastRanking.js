@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./BroadcastRanking.css";
+import { Link } from "react-router-dom"; // React Router의 Link 컴포넌트 추가
 
 const fallbackData = [
   "{}",
@@ -37,6 +38,10 @@ function BroadcastRanking() {
             viewers: parseInt(video.concurrentViewers || 0, 10),
             category: video.category || "기타",
             profileImage: video.channelThumbnailUrl || "https://via.placeholder.com/88",
+            videoId: video.videoId, // videoId 추가
+            currentDate: video.videoAPIReceivedTime
+              ? video.videoAPIReceivedTime.split(" ")[0] // 날짜 추출
+              : "2024-12-12", // 기본값 설정
           }));
 
         setRankings(sortedRankings);
@@ -57,6 +62,8 @@ function BroadcastRanking() {
             viewers: parseInt(video.concurrentViewers || 0, 10),
             category: video.category || "기타",
             profileImage: video.videoThumbnailUrl || "https://via.placeholder.com/88",
+            videoId: video.videoId, // videoId 추가
+            currentDate: video.videoAPIReceivedTime.split(" ")[0]
           }));
 
         setRankings(fallbackRankings);
@@ -118,7 +125,11 @@ function BroadcastRanking() {
                   {rank.name}
                 </div>
               </td>
-              <td>{rank.title}</td>
+              <td>
+                <Link to={`/analytics/${rank.currentDate}/${rank.videoId}`}>
+                  {rank.title}
+                </Link>
+              </td>
               <td>{rank.viewers.toLocaleString()}명</td>
               <td>
                 <span className="category-badge">{rank.category}</span>
