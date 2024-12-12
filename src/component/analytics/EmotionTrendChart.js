@@ -36,12 +36,46 @@ const EmotionTrendChart = ({ data }) => {
     setDropdownOpen(false); // 드롭다운 닫기
   };
 
+  // 시간 데이터를 HH:mm 형식으로 변환
+  const formatTime = (time) => {
+    return new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  // 데이터 그룹화
+  const groupDataByMinute = (data) => {
+    const groupedData = {};
+
+    data.forEach((item) => {
+      const time = formatTime(item.time); // HH:mm 형식으로 변환
+      if (!groupedData[time]) {
+        groupedData[time] = {
+          time,
+          veryPositive: 0,
+          positive: 0,
+          neutral: 0,
+          negative: 0,
+          veryNegative: 0,
+        };
+      }
+      groupedData[time].veryPositive += item.veryPositive;
+      groupedData[time].positive += item.positive;
+      groupedData[time].neutral += item.neutral;
+      groupedData[time].negative += item.negative;
+      groupedData[time].veryNegative += item.veryNegative;
+    });
+
+    return Object.values(groupedData);
+  };
+
+  // 그룹화된 데이터
+  const groupedData = groupDataByMinute(data);
+
   const emotionTrendData = {
-    labels: data.map((item) => item.time),
+    labels: groupedData.map((item) => item.time),
     datasets: [
       {
         label: "매우 긍정",
-        data: data.map((item) => item.veryPositive),
+        data: groupedData.map((item) => item.veryPositive),
         borderColor: "#2E7D32",
         backgroundColor: "rgba(46, 125, 50, 0.2)",
         borderWidth: 2,
@@ -50,7 +84,7 @@ const EmotionTrendChart = ({ data }) => {
       },
       {
         label: "긍정",
-        data: data.map((item) => item.positive),
+        data: groupedData.map((item) => item.positive),
         borderColor: "#4CAF50",
         backgroundColor: "rgba(76, 175, 80, 0.2)",
         borderWidth: 2,
@@ -59,7 +93,7 @@ const EmotionTrendChart = ({ data }) => {
       },
       {
         label: "중립",
-        data: data.map((item) => item.neutral),
+        data: groupedData.map((item) => item.neutral),
         borderColor: "#FFD700",
         backgroundColor: "rgba(255, 215, 0, 0.2)",
         borderWidth: 2,
@@ -68,7 +102,7 @@ const EmotionTrendChart = ({ data }) => {
       },
       {
         label: "부정",
-        data: data.map((item) => item.negative),
+        data: groupedData.map((item) => item.negative),
         borderColor: "#F44336",
         backgroundColor: "rgba(244, 67, 54, 0.2)",
         borderWidth: 2,
@@ -77,7 +111,7 @@ const EmotionTrendChart = ({ data }) => {
       },
       {
         label: "매우 부정",
-        data: data.map((item) => item.veryNegative),
+        data: groupedData.map((item) => item.veryNegative),
         borderColor: "#B71C1C",
         backgroundColor: "rgba(183, 28, 28, 0.2)",
         borderWidth: 2,
@@ -88,11 +122,11 @@ const EmotionTrendChart = ({ data }) => {
   };
 
   const dummyChartData = {
-    labels: data.map((item) => item.time),
+    labels: groupedData.map((item) => item.time),
     datasets: [
       {
         label: "실시간 시청자 수",
-        data: data.map((item) => Math.random() * 100), // 더미 데이터
+        data: groupedData.map(() => Math.random() * 100), // 더미 데이터
         borderColor: "#FF5733",
         backgroundColor: "rgba(255, 87, 51, 0.2)",
         borderWidth: 2,
@@ -153,13 +187,13 @@ const EmotionTrendChart = ({ data }) => {
         </div>
       </div>
       <div className="chart">
-      <Line
-        data={selectedChart === "emotionTrend" ? emotionTrendData : dummyChartData}
-        options={options}
-      />
+        <Line
+          data={selectedChart === "emotionTrend" ? emotionTrendData : dummyChartData}
+          options={options}
+        />
       </div>
     </div>
   );
-}
+};
 
 export default EmotionTrendChart;
