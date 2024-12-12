@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import axios from "axios";
 import "./LiveViewerChart.css";
 
 ChartJS.register(
@@ -22,32 +23,54 @@ ChartJS.register(
   Legend
 );
 
-function LiveViewerChart({ data }) {
-  const [selectedMetric, setSelectedMetric] = useState("viewers"); // 기본값: '시청자 수'
-  const [dropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 열림 상태
+function LiveViewerChart() {
+  const [viewerData, setViewerData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev); // 드롭다운 열림/닫힘 토글
-  };
+  useEffect(() => {
+    const fetchViewerData = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
 
-  const handleMetricChange = (metric) => {
-    setSelectedMetric(metric); // 선택한 메트릭으로 변경
-    setDropdownOpen(false); // 드롭다운 닫기
-  };
+        const rawData = Object.values(response.data)
+          .map((item) => JSON.parse(item))
+          .filter((video) => video.concurrentViewers);
+
+        const totalViewers = rawData.reduce(
+          (sum, video) => sum + parseInt(video.concurrentViewers, 10),
+          0
+        );
+
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setViewerData((prevData) => [...prevData, { time: currentTime, viewers: totalViewers }]);
+      } catch (error) {
+        console.error("데이터 가져오기 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchViewerData();
+
+    const interval = setInterval(() => {
+      fetchViewerData();
+    }, 60000); // 1분마다 호출
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading && viewerData.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   const chartData = {
-    labels: data.map((entry) => entry.time),
+    labels: viewerData.map((entry) => entry.time),
     datasets: [
       {
-        label: selectedMetric === "viewers" ? "시청자 수" : "댓글 수",
-        data: data.map((entry) =>
-          selectedMetric === "viewers" ? entry.viewers : entry.comments
-        ),
-        borderColor: selectedMetric === "viewers" ? "#43FF8C" : "#4743FF",
-        backgroundColor:
-          selectedMetric === "viewers"
-            ? "rgba(67, 255, 140, 0.2)"
-            : "rgba(71, 67, 255, 0.2)",
+        label: "총 시청자 수",
+        data: viewerData.map((entry) => entry.viewers),
+        borderColor: "#43FF8C",
+        backgroundColor: "rgba(67, 255, 140, 0.2)",
         borderWidth: 2,
         tension: 0.4,
       },
@@ -77,7 +100,7 @@ function LiveViewerChart({ data }) {
         borderColor: "#3B3B3B",
         borderWidth: 1,
         callbacks: {
-          label: (context) => `${context.raw} 명`,
+          label: (context) => `${context.raw.toLocaleString()} 명`,
         },
       },
     },
@@ -112,28 +135,7 @@ function LiveViewerChart({ data }) {
 
   return (
     <div className="chart-container">
-      <div className="chart-header">
-        <h2>{selectedMetric === "viewers" ? "총 시청자 수" : "총 댓글 수"}</h2>
-        <div className="filter">
-          <span onClick={toggleDropdown}>
-            {selectedMetric === "viewers" ? "시청자 수 ▼" : "댓글 수 ▼"}
-          </span>
-          <div className={`dropdown ${dropdownOpen ? "open" : ""}`}>
-            <div
-              className="dropdown-item"
-              onClick={() => handleMetricChange("viewers")}
-            >
-              <span className="dropdown-icon">👥</span> 시청자 수
-            </div>
-            <div
-              className="dropdown-item"
-              onClick={() => handleMetricChange("comments")}
-            >
-              <span className="dropdown-icon">💬</span> 댓글 수
-            </div>
-          </div>
-        </div>
-      </div>
+      <h2>1분 단위 총 시청자 수</h2>
       <div className="chart">
         <Line data={chartData} options={options} />
       </div>
