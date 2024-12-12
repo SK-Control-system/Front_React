@@ -44,7 +44,7 @@ const Tabs = ({ currentDate, videoId }) => {
           className={`tab ${activeTab === "likesAndComments" ? "active" : ""}`}
           onClick={() => setActiveTab("likesAndComments")}
         >
-          좋아요 & 댓글
+          좋아요 수
         </div>
       </div>
 
