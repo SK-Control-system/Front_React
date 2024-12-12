@@ -113,7 +113,6 @@ const LiveBroadcastPage = () => {
   useEffect(() => {
     const fetchSubscribedChannels = async () => {
       try {
-        // 구독 채널 데이터를 불러오는 API 호출
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_POD_URL}/api/subscribed-channels`
         );
@@ -181,7 +180,13 @@ const LiveBroadcastPage = () => {
       <div className="live-broadcast-category-section">
         <h2 className="live-broadcast-category-title">내 구독 목록</h2>
         <div className="live-broadcast-list-container">
-          <div className="live-broadcast-list">
+          <button
+            className="scroll-button left"
+            onClick={() => scroll("내 구독 목록", "left")}
+          >
+            ◀
+          </button>
+          <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
             {subscribedChannels.map((channel, idx) => (
               <BroadcastCard
                 key={idx}
@@ -193,6 +198,12 @@ const LiveBroadcastPage = () => {
             ))}
             <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
           </div>
+          <button
+            className="scroll-button right"
+            onClick={() => scroll("내 구독 목록", "right")}
+          >
+            ▶
+          </button>
         </div>
       </div>
 
@@ -201,27 +212,49 @@ const LiveBroadcastPage = () => {
         <div key={index} className="live-broadcast-category-section">
           <h2 className="live-broadcast-category-title">{category}</h2>
           <div className="live-broadcast-list-container">
-            <div className="live-broadcast-list">
-              {groupedData[category].map((broadcast, idx) => (
-                <BroadcastCard
-                  key={idx}
-                  videoId={broadcast.videoId}
-                  videoTitle={broadcast.videoTitle}
-                  channelTitle={broadcast.channelTitle}
-                  concurrentViewers={broadcast.concurrentViewers}
-                  category={broadcast.category}
-                  videoThumbnailUrl={broadcast.videoThumbnailUrl}
-                  channelThumbnailUrl={broadcast.channelThumbnailUrl}
-                  actualStartTime={broadcast.actualStartTime}
-                  currentDate={
-                    broadcast.videoAPIReceivedTime
-                      ? broadcast.videoAPIReceivedTime.split(" ")[0]
-                      : "unknown"
-                  }
-                  stats={broadcast.stats || {}}
-                />
-              ))}
+            <button
+              className="scroll-button left"
+              onClick={() => scroll(category, "left")}
+            >
+              ◀
+            </button>
+            <div
+              className="live-broadcast-list"
+              ref={(el) => (scrollRefs.current[category] = el)}
+            >
+              {groupedData[category].map((broadcast, idx) => {
+                const currentDate = broadcast.videoAPIReceivedTime
+                  ? broadcast.videoAPIReceivedTime.split(" ")[0]
+                  : "unknown";
+
+                return (
+                  <BroadcastCard
+                    key={idx}
+                    videoId={broadcast.videoId}
+                    videoTitle={broadcast.videoTitle}
+                    channelTitle={broadcast.channelTitle}
+                    concurrentViewers={broadcast.concurrentViewers}
+                    category={broadcast.category}
+                    videoThumbnailUrl={broadcast.videoThumbnailUrl}
+                    channelThumbnailUrl={broadcast.channelThumbnailUrl}
+                    actualStartTime={broadcast.actualStartTime}
+                    currentDate={currentDate}
+                    stats={{
+                      likes: broadcast.likeCount,
+                      comments: 450,
+                      positiveReactions: "80%",
+                      averageViewTime: "15분",
+                    }}
+                  />
+                );
+              })}
             </div>
+            <button
+              className="scroll-button right"
+              onClick={() => scroll(category, "right")}
+            >
+              ▶
+            </button>
           </div>
         </div>
       ))}
