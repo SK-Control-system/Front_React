@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import "../analytics/EmotionTrendChart.css";
 import "../../App.css";
@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -23,9 +24,10 @@ ChartJS.register(
   Legend
 );
 
-const EmotionTrendChart = ({ data }) => {
+const EmotionTrendChart = ({ data, currentDate, videoId }) => {
   const [selectedChart, setSelectedChart] = useState("emotionTrend"); // 기본값: 감정 트렌드
   const [dropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 열림 상태
+  const [viewerData, setViewerData] = useState({ labels: [], data: [] }); // 시청자 수 데이터
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev); // 드롭다운 열림/닫힘 토글
@@ -121,12 +123,50 @@ const EmotionTrendChart = ({ data }) => {
     ],
   };
 
-  const dummyChartData = {
-    labels: groupedData.map((item) => item.time),
+  // 시청자 수 데이터 가져오기
+  useEffect(() => {
+    const fetchViewerData = async () => {
+      try {
+        // 시간 데이터 가져오기
+        const timeResponse = await axios.post(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`
+        );
+
+        // 시청자 수 데이터 가져오기
+        const viewerResponse = await axios.post(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewers?index=video_youtube_${currentDate}&videoid=${videoId}`
+        );
+
+        // 시간 데이터와 시청자 수 데이터 매칭
+        const timestamps = timeResponse.data;
+        const viewers = viewerResponse.data;
+
+        // 시간 데이터가 더 많은 경우 마지막 데이터 유지
+        const minLength = Math.min(timestamps.length, viewers.length);
+        const trimmedTimestamps = timestamps.slice(0, minLength);
+        const trimmedViewers = viewers.slice(0, minLength);
+
+        // 시간 포맷 변환
+        const formattedTimestamps = trimmedTimestamps.map((time) => formatTime(time));
+
+        setViewerData({
+          labels: formattedTimestamps,
+          data: trimmedViewers,
+        });
+      } catch (error) {
+        console.error("시청자 수 데이터 가져오기 실패:", error);
+      }
+    };
+
+    fetchViewerData();
+  }, [currentDate, videoId]);
+
+  const viewerChartData = {
+    labels: viewerData.labels,
     datasets: [
       {
         label: "실시간 시청자 수",
-        data: groupedData.map(() => Math.random() * 100), // 더미 데이터
+        data: viewerData.data,
         borderColor: "#FF5733",
         backgroundColor: "rgba(255, 87, 51, 0.2)",
         borderWidth: 2,
@@ -179,7 +219,7 @@ const EmotionTrendChart = ({ data }) => {
             </div>
             <div
               className="dropdown-item"
-              onClick={() => handleChartChange("dummyChart")}
+              onClick={() => handleChartChange("viewerChart")}
             >
               <span className="dropdown-icon"></span>시청자 수 
             </div>
@@ -188,7 +228,7 @@ const EmotionTrendChart = ({ data }) => {
       </div>
       <div className="chart">
         <Line
-          data={selectedChart === "emotionTrend" ? emotionTrendData : dummyChartData}
+          data={selectedChart === "emotionTrend" ? emotionTrendData : viewerChartData}
           options={options}
         />
       </div>
