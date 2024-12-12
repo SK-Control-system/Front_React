@@ -190,7 +190,7 @@ const AnalyticsPage = () => {
         <ChatBox chatData={filteredChatData} />
       </div>
       <div className="우측">
-        <EmotionTrendChart data={emotionData} />
+        <EmotionTrendChart data={emotionData} currentDate={currentDate} videoId={videoId} />
         <Tabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
