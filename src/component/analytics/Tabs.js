@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import "./Tabs.css"; // CSS 파일
 import ViewerReactionChart from "./ViewerReactionChart"; // ViewerReactionChart 컴포넌트
 import WordCloudComponent from "./WordCloudComponent"; // WordCloud 컴포넌트
 import LikesAndComments from "./LikesAndComments";
-
-
 
 // 탭 내용에 표시될 컴포넌트들
 
