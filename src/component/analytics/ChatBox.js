@@ -42,7 +42,6 @@ const ChatBox = ({ chatData }) => {
               <div className="chat-info">
                 <strong className="chat-user">
                   {chat.chatterName}
-                  <span className="chat-time">{chat.chatTime}</span>
                 </strong>
               </div>
               <p className="chat-text">{chat.message}</p>

@@ -48,7 +48,7 @@ const LikesAndComments = ({ currentDate, videoId }) => {
           `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/likeCount?index=video_youtube_${currentDate}&videoid=${videoId}`
         );
 
-        const timeResponse = await axios.post(`${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/searchConcurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`);
+        const timeResponse = await axios.post(`${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`);
 
         // 데이터 파싱 및 가공
         const timestamps = timeResponse.data; // 받아온 데이터 (시간 정보)
