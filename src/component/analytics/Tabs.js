@@ -18,7 +18,7 @@ const Tabs = ({ currentDate, videoId }) => {
       case "keywordStats":
         return <WordCloudComponent currentDate={currentDate} videoId={videoId} />; // WordCloud 컴포넌트 연결
       case "likesAndComments":
-        return <LikesAndComments />;
+        return <LikesAndComments currentDate={currentDate} videoId={videoId} />;
       default:
         return null;
     }

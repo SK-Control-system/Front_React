@@ -43,11 +43,7 @@ function Subscription({ show, onHide }) {
 
   const handleSubscription = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_POD_URL}/register`, 
-        {
-          channelId: channelId,
-          userId: userId
-        },
+      await axios.post(`${process.env.REACT_APP_API_POD_URL}/register?channelId=${channelId}&userId=${userId}`, 
         {
           headers: {
             "Content-Type": "application/json",
