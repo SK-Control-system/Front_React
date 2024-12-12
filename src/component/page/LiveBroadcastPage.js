@@ -83,7 +83,7 @@ const LiveBroadcastPage = () => {
         });
 
         // video.category가 'n'인 경우 필터링
-        const validData = rawData.filter((video) => video.videoId && video.category !== 'n');
+        const validData = rawData.filter((video) => video.videoId && (video.category !== 'n'));
 
         const grouped = validData.reduce((acc, video) => {
           const category = video.category || "기타";
