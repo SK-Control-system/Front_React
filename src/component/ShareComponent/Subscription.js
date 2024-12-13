@@ -42,19 +42,33 @@ function Subscription({ show, onHide }) {
   };
 
   const handleSubscription = async () => {
+    const token = sessionStorage.getItem("token"); // Google OAuth2.0 액세스 토큰
+    const userId = sessionStorage.getItem("userId"); // 유저 ID
+  
     try {
-      await axios.post(`${process.env.REACT_APP_API_POD_URL}/subscription/register?channelId=${channelId}&userId=${userId}`, 
+      console.log("토큰@@@@@", token);
+      console.log("@@@@@@@@", channelId, userId);
+  
+      if (!token || !userId) {
+        alert("유효한 토큰 또는 유저 정보가 없습니다.");
+        return;
+      }
+  
+      await axios.post(
+        `${process.env.REACT_APP_API_POD_URL}/subscription/register?channelId=${channelId}&userId=${userId}`,
+        {}, // 요청 body가 비어있다면 빈 객체 전달
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}` // 액세스 토큰을 Authorization 헤더에 추가
           }
         }
       );
-      alert('구독이 추가되었습니다!');
+  
+      alert("구독이 추가되었습니다!");
     } catch (error) {
-      console.error('구독 요청 중 오류 발생:', error);
-      alert('구독 요청에 실패했습니다.');
+      console.error("구독 요청 중 오류 발생:", error);
+      alert("구독 요청에 실패했습니다.");
     }
   };
 
