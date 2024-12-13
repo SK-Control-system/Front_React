@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaHome, FaFileAlt, FaChartBar, FaUsers, FaClosedCaptioning, FaCopyright, FaCog } from "react-icons/fa";
 import "./SideBar.css";
+import { useUser } from "../../provider/UserContext";
 
 const SideBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { userName } = useUser(); // Google 사용자 이름 가져오기
 
   return (
     <div
@@ -12,7 +14,7 @@ const SideBar = () => {
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      <h2 className="channel-name">루키즈1조</h2>
+       <h2 className="channel-name">{userName || "로그인 필요"}</h2> {/* 사용자 이름 표시 */}
       <ul className="menu">
         <li>
           <Link to="/">
