@@ -13,7 +13,8 @@ const BroadcastCard = ({
   videoThumbnailUrl,
   channelThumbnailUrl,
   actualStartTime,
-  stats,
+  // stats,
+  stats = {},
   videoId,
   currentDate,
 }) => {
@@ -109,16 +110,24 @@ const LiveBroadcastPage = () => {
   const [error, setError] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scrollRefs = useRef({});
-
+  const [userId, setUserId] = useState(() => {
+    // 세션스토리지에서 userId 가져오기
+    return sessionStorage.getItem("userId") || null;
+  });
+  
   useEffect(() => {
     const fetchSubscribedChannels = async () => {
+      console.log(userId);
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_POD_URL}/api/subscribed-channels`
-        );
+        const params = new URLSearchParams({ userId });
+        const url = `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/channel-ids?${params.toString()}`;
+        const response = await axios.post(url);
         setSubscribedChannels(response.data);
       } catch (err) {
         console.error("구독 채널 데이터 불러오기 실패:", err);
+        setError("구독 채널을 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -242,7 +251,8 @@ const LiveBroadcastPage = () => {
                     actualStartTime={broadcast.actualStartTime}
                     currentDate={currentDate}
                     stats={{
-                      likes: broadcast.likeCount,
+                      // likes: broadcast.likeCount,
+                      likes: 123,
                       comments: 450,
                       positiveReactions: "80%",
                       averageViewTime: "15분",
