@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavbarComponent from "./component/ShareComponent/NavbarComponent";
 import SideBar from "./component/ShareComponent/SideBar"
@@ -6,64 +6,43 @@ import MainPage from "./component/page/MainPage";
 import AnalyticsPage from "./component/page/AnalyticsPage";
 import ChannelAnalyticsPage from "./component/channel/ChannelAnalyticsPage";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
-import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
 import { WebSocketProvider } from "./provider/WebSocketContext";
-import OAuth2RedirectHandler from "./redirection/OAuth2RedirectHandler";
+import "./App.css";
+import axios from "axios";
 
+
+import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
 function App() {
+  const [viewerData, setViewerData] = useState([]);
 
-  const stats = {
-    totalViewers: 72131,
-    avgViewers: 36111,
-    totalLikes: 15552,
-    totalComments: 23184,
-  };
+  useEffect(() => {
+    const fetchViewerData = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
 
-  const viewerData = [
-    { time: "15:00", viewers: 10 },
-    { time: "18:00", viewers: 25 },
-    { time: "21:00", viewers: 40 },
-    { time: "00:00", viewers: 61 },
-    { time: "03:00", viewers: 55 },
-    { time: "06:00", viewers: 45 },
-    { time: "09:00", viewers: 70 },
-    { time: "12:00", viewers: 30 },
-  ];
+        const rawData = Object.values(response.data)
+          .map((item) => JSON.parse(item))
+          .filter((video) => video.concurrentViewers);
 
-  const categories = [
-    { name: "리그 오브 레전드", percentage: 45, color: "#456CFF" },
-    { name: "음악", percentage: 20, color: "#43FF8C" },
-    { name: "정치", percentage: 18, color: "#FF43E3" },
-    { name: "버추얼", percentage: 17, color: "#FFA344" },
-  ];
+        const totalViewers = rawData.reduce(
+          (sum, video) => sum + parseInt(video.concurrentViewers, 10),
+          0
+        );
 
-  const rankings = [
-    {
-      name: "봉준",
-      profileImage: "https://yt3.ggpht.com/0A00TuicuSqhF8lYQKnE7MxzCrsmEpLbVG2b8KeBo591PzbEHwpzIaTG4kX6yJcNT6EfGXi1kWg=s88-c-k-c0x00ffffff-no-rj",
-      title: "교장서버 마크",
-      viewers: 44708,
-      category: "마인크래프트",
-      color: "#B3B6FF",
-    },
-    {
-      name: "김성태",
-      profileImage: "https://yt3.ggpht.com/ytc/AIdro_kblg45EIsy8otvQCXIc1a6Y8JqNjAS3i8NcmXD-2E-TXw=s88-c-k-c0x00ffffff-no-rj",
-      title: "마인크래프트 김성태",
-      viewers: 35128,
-      category: "음악",
-      color: "#FFFACD",
-    },
-    {
-      name: "우왁굳",
-      profileImage: "https://yt3.ggpht.com/vhOEy7Ode6Y8ZN3noHKZua0LMt2n2Z7xfEyfWmzTXwQ6oq59BFyTXnN9AcnksHTYAM1YCzdY=s88-c-k-c0x00ffffff-no-rj",
-      title: "토크/겜방",
-      viewers: 15321,
-      category: "게임",
-      color: "#FFC0CB",
-    },
-  ];
+        const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        setViewerData((prevData) => [...prevData, { time: currentTime, viewers: totalViewers }]);
+      } catch (error) {
+        console.error("데이터 가져오기 실패:", error);
+      }
+    };
+
+    fetchViewerData();
+    const interval = setInterval(fetchViewerData, 60000); // 1분마다 호출
+
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 해제
+  }, []);
+
+
 
   return (
     <WebSocketProvider>
@@ -73,21 +52,20 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<MainPage stats={stats} viewerData={viewerData} categories={categories} rankings={rankings} />}
+            element={<MainPage viewerData={viewerData} />}
           />
-          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/analytics" element={<AnalyticsPage  />} />
           <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
           <Route
             path="/livebroadcast"
-            element={<LiveBroadcastPage categories={categories} rankings={rankings} />}
+            element={<LiveBroadcastPage viewerData={viewerData} />}
           />
-          {/* <Route path="/channel" element={<ChannelAnalyticsPage />} /> */}
           <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
-          <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
         </Routes>
       </Router>
     </WebSocketProvider>
   );
 }
+
 
 export default App;

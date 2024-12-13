@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,7 +10,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import axios from "axios";
 import "./LiveViewerChart.css";
 
 ChartJS.register(
@@ -23,46 +22,7 @@ ChartJS.register(
   Legend
 );
 
-function LiveViewerChart() {
-  const [viewerData, setViewerData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchViewerData = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/videoId`);
-
-        const rawData = Object.values(response.data)
-          .map((item) => JSON.parse(item))
-          .filter((video) => video.concurrentViewers);
-
-        const totalViewers = rawData.reduce(
-          (sum, video) => sum + parseInt(video.concurrentViewers, 10),
-          0
-        );
-
-        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        setViewerData((prevData) => [...prevData, { time: currentTime, viewers: totalViewers }]);
-      } catch (error) {
-        console.error("데이터 가져오기 실패:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchViewerData();
-
-    const interval = setInterval(() => {
-      fetchViewerData();
-    }, 60000); // 1분마다 호출
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading && viewerData.length === 0) {
-    return <div>Loading...</div>;
-  }
-
+function LiveViewerChart({ viewerData }) {
   const chartData = {
     labels: viewerData.map((entry) => entry.time),
     datasets: [
@@ -84,52 +44,16 @@ function LiveViewerChart() {
       legend: {
         display: true,
         position: "top",
-        labels: {
-          color: "#FFFFFF",
-          font: {
-            family: "NanumSquare Neo OTF",
-            size: 14,
-            weight: 700,
-          },
-        },
       },
       tooltip: {
-        backgroundColor: "#FFFFFF",
-        titleColor: "#000000",
-        bodyColor: "#000000",
-        borderColor: "#3B3B3B",
-        borderWidth: 1,
         callbacks: {
           label: (context) => `${context.raw.toLocaleString()} 명`,
         },
       },
     },
     scales: {
-      x: {
-        grid: {
-          color: "#3B3B3B",
-        },
-        ticks: {
-          color: "#7C8DB5",
-          font: {
-            family: "NanumSquare Neo OTF",
-            size: 12,
-          },
-        },
-      },
-      y: {
-        grid: {
-          color: "#3B3B3B",
-        },
-        ticks: {
-          color: "#7C8DB5",
-          font: {
-            family: "NanumSquare Neo OTF",
-            size: 12,
-          },
-        },
-        beginAtZero: true,
-      },
+      x: { beginAtZero: true },
+      y: { beginAtZero: true },
     },
   };
 
