@@ -55,6 +55,11 @@ jobs:
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig --region us-east-1 --name CC-cluster
+      
+      - name: Apply Kubernetes configurations
+        run: |
+          kubectl apply -f yaml/live_on_fe.yaml
+          kubectl apply -f yaml/live_on_fe-lb.yaml
 
       - name: Deploy to EKS
         env:
