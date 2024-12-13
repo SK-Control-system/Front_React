@@ -132,7 +132,9 @@ function BroadcastRanking() {
               </td>
               <td>{rank.viewers.toLocaleString()}명</td>
               <td>
-                <span className="category-badge">{rank.category}</span>
+                {rank.category !== 'n' && (
+                  <span className="category-badge">{rank.category}</span>
+                )}
               </td>
             </tr>
           ))}
