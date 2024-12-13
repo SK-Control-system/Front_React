@@ -19,6 +19,23 @@ const BroadcastCard = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // 방송 시작 시간부터 현재까지의 시간 계산
+  const calculateBroadcastDuration = (startTime) => {
+    if (!startTime) return "시간 정보 없음";
+
+    const start = new Date(startTime);
+    const now = new Date();
+    const diff = now - start; // 밀리초 단위
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return `${hours}시간 ${minutes}분 ${seconds}초`;
+  };
+
+  const broadcastDuration = calculateBroadcastDuration(actualStartTime);
+
   return (
     <Link to={`/analytics/${currentDate}/${videoId}`} className="live-broadcast-card-link">
       <div
@@ -43,11 +60,14 @@ const BroadcastCard = ({
             <span className="live-broadcast-category">{category}</span>
           </div>
           <div className="live-broadcast-card-content">
-            <img
-              className="live-broadcast-channel-profile"
-              src={channelThumbnailUrl || "https://via.placeholder.com/120"}
-              alt={`${channelTitle} profile`}
-            />
+            {/* 채널 썸네일이 있는 경우에만 표시 */}
+            {channelThumbnailUrl && (
+              <img
+                className="live-broadcast-channel-profile"
+                src={channelThumbnailUrl || "https://via.placeholder.com/120"}
+                alt={`${channelTitle} profile`}
+              />
+            )}
             <span className="live-broadcast-card-title">{videoTitle}</span>
           </div>
           <div className="live-broadcast-card-footer">
@@ -64,7 +84,7 @@ const BroadcastCard = ({
               <li>❤️ 좋아요: {stats.likes || 0}개</li>
               <li>💬 댓글: {stats.comments || 0}개</li>
               <li>😀 긍정 반응: {stats.positiveReactions || "80%"}</li>
-              <li>⌛ 방송 진행 시간: {stats.averageViewTime || "15분"}</li>
+              <li>⌛ 방송 진행 시간: {broadcastDuration}</li>
             </ul>
           </div>
         )}
