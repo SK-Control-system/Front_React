@@ -9,9 +9,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { WebSocketProvider } from "./provider/WebSocketContext";
 import "./App.css";
 import axios from "axios";
-
-
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
+import OAuth2RedirectHandler from "./redirection/OAuth2RedirectHandler";
+
 function App() {
   const [viewerData, setViewerData] = useState([]);
 
@@ -54,13 +54,14 @@ function App() {
             path="/"
             element={<MainPage viewerData={viewerData} />}
           />
-          <Route path="/analytics" element={<AnalyticsPage  />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
           <Route
             path="/livebroadcast"
             element={<LiveBroadcastPage viewerData={viewerData} />}
           />
           <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+          <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
         </Routes>
       </Router>
     </WebSocketProvider>
