@@ -31,7 +31,7 @@ const LikesAndComments = ({ currentDate, videoId }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/searchConcurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`)
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`)
         console.log(response.data)
       } catch (err) {
         console.error(err)
