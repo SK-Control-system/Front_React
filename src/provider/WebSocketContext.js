@@ -12,6 +12,7 @@ export const WebSocketProvider = ({ children }) => {
   const [message, setMessage] = useState(null); // 백엔드에서 온 메시지 저장
   const [retryCount, setRetryCount] = useState(0); // 재연결 시도 횟수
   const [notification, setNotification] = useState(null); // 알림 데이터 저장
+  const processedVideoIds = useRef(new Set()); // 이미 처리한 videoId 저장
 
   useEffect(() => {
     if (!userId) {
@@ -46,11 +47,18 @@ export const WebSocketProvider = ({ children }) => {
             const videoTitle = entry?.title;
             const videoId = entry["yt:videoId"];
 
-            setNotification({
-              channelTitle,
-              videoTitle,
-              videoId,
-            });
+            // 중복된 videoId인지 확인
+            if (!processedVideoIds.current.has(videoId)) {
+              // 새 videoId인 경우 처리
+              processedVideoIds.current.add(videoId);
+              setNotification({
+                channelTitle,
+                videoTitle,
+                videoId,
+              });
+            } else {
+              console.log(`중복된 videoId(${videoId}) 무시`);
+            }
           }
         } catch (error) {
           console.error("WebSocket 메시지 처리 중 에러:", error);
