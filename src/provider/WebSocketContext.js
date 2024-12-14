@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useUser } from "./UserContext";
-import { parseStringPromise } from "xml2js"; // XML 파싱을 위한 라이브러리
+import { XMLParser } from "fast-xml-parser"; // XML 파싱을 위한 라이브러리
 
 // WebSocket Context 생성
 const WebSocketContext = createContext(null);
@@ -35,15 +35,17 @@ export const WebSocketProvider = ({ children }) => {
         console.error("WebSocket 연결 에러:", error);
       };
 
+      const parser = new XMLParser({ ignoreAttributes: false });
+
       ws.onmessage = async (event) => {
         try {
           const xmlData = event.data;
-          const jsonData = await parseStringPromise(xmlData, { explicitArray: false });
+          const jsonData = parser.parse(xmlData);
 
           console.log("Message from server (parsed):", jsonData);
 
           // XML 데이터에서 필요한 정보 추출
-          const entry = jsonData.feed.entry;
+          const entry = jsonData.feed && jsonData.feed.entry;
           if (entry) {
             const channelTitle = entry.author.name;
             const videoTitle = entry.title;
