@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useUser } from "./UserContext";
+import { parseStringPromise } from "xml2js"; // XML 파싱을 위한 라이브러리
+import axios from "axios"; // API 요청을 위한 라이브러리
 
 // WebSocket Context 생성
 const WebSocketContext = createContext(null);
@@ -10,6 +12,7 @@ export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState(null); // 백엔드에서 온 메시지 저장
   const [retryCount, setRetryCount] = useState(0); // 재연결 시도 횟수
+  const [notification, setNotification] = useState(null); // 알림 데이터 저장
 
   useEffect(() => {
     if (!userId) {
@@ -33,13 +36,26 @@ export const WebSocketProvider = ({ children }) => {
         console.error("WebSocket 연결 에러:", error);
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         try {
-          const data = JSON.parse(event.data);
-          console.log("Message from server:", data);
+          const xmlData = event.data;
+          const jsonData = await parseStringPromise(xmlData, { explicitArray: false });
 
-          if (data.type === "alert") {
-            setMessage(data.message);
+          console.log("Message from server (parsed):", jsonData);
+
+          // XML 데이터에서 필요한 정보 추출
+          const entry = jsonData.feed.entry;
+          if (entry) {
+            const channelTitle = entry.author.name;
+            const videoTitle = entry.title;
+            const videoId = entry["yt:videoId"];
+
+            // 알림 데이터 설정
+            setNotification({
+              channelTitle,
+              videoTitle,
+              videoId,
+            });
           }
         } catch (error) {
           console.error("WebSocket 메시지 처리 중 에러:", error);
@@ -73,8 +89,20 @@ export const WebSocketProvider = ({ children }) => {
     };
   }, [userId, retryCount, socket]);
 
+  // 알림 처리 함수
+  const handleNotification = async (response) => {
+    if (response === "yes" && notification) {
+      const currentDate = new Date().toISOString().split("T")[0]; // 오늘 날짜 (YYYY-MM-DD 형식)
+      const { videoId } = notification;
+
+      // 페이지 이동
+      window.location.href = `/analytics/${currentDate}/${videoId}`;
+    }
+    setNotification(null); // 알림 초기화
+  };
+
   return (
-    <WebSocketContext.Provider value={{ socket, message, setMessage }}>
+    <WebSocketContext.Provider value={{ socket, message, setMessage, notification, handleNotification }}>
       {children}
     </WebSocketContext.Provider>
   );
