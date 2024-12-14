@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useUser } from "./UserContext";
 import { XMLParser } from "fast-xml-parser"; // XML 파싱을 위한 라이브러리
 
@@ -8,7 +8,7 @@ const WebSocketContext = createContext(null);
 export const WebSocketProvider = ({ children }) => {
   const { userId } = useUser();
 
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null); // socket을 useRef로 관리
   const [message, setMessage] = useState(null); // 백엔드에서 온 메시지 저장
   const [retryCount, setRetryCount] = useState(0); // 재연결 시도 횟수
   const [notification, setNotification] = useState(null); // 알림 데이터 저장
@@ -19,39 +19,33 @@ export const WebSocketProvider = ({ children }) => {
       return;
     }
 
-    // WebSocket 연결
     const connectWebSocket = () => {
-      const ws = new WebSocket(
-        `wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
-      );
+      const ws = new WebSocket(`wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`);
 
       ws.onopen = () => {
         console.log("WebSocket connected");
-        setRetryCount(0); // 연결 성공 시 재시도 횟수 초기화
+        setRetryCount(0);
       };
 
-      // 에러 핸들러 추가
       ws.onerror = (error) => {
         console.error("WebSocket 연결 에러:", error);
       };
 
       const parser = new XMLParser({ ignoreAttributes: false });
 
-      ws.onmessage = async (event) => {
+      ws.onmessage = (event) => {
         try {
           const xmlData = event.data;
           const jsonData = parser.parse(xmlData);
 
           console.log("Message from server (parsed):", jsonData);
 
-          // XML 데이터에서 필요한 정보 추출
           const entry = jsonData.feed && jsonData.feed.entry;
           if (entry) {
-            const channelTitle = entry.author.name;
-            const videoTitle = entry.title;
+            const channelTitle = entry?.author?.name;
+            const videoTitle = entry?.title;
             const videoId = entry["yt:videoId"];
 
-            // 알림 데이터 설정
             setNotification({
               channelTitle,
               videoTitle,
@@ -68,27 +62,25 @@ export const WebSocketProvider = ({ children }) => {
           console.log(`WebSocket 연결 정상 종료 (코드: ${event.code}, 사유: ${event.reason})`);
         } else {
           console.error("WebSocket 연결이 비정상적으로 종료됨");
-          // 재연결 시도
-          const retryInterval = Math.min(1000 * 2 ** retryCount, 35000); // 재연결 간격 증가 (최대 35초)
+          const retryInterval = Math.min(1000 * 2 ** retryCount, 35000);
           setTimeout(() => {
             setRetryCount((prev) => prev + 1);
-            connectWebSocket();
           }, retryInterval);
         }
       };
 
-      setSocket(ws);
+      socketRef.current = ws; // useRef를 통해 ws 인스턴스 보관
     };
 
     connectWebSocket();
 
-    // 컴포넌트 언마운트 시 WebSocket 닫기
     return () => {
-      if (socket) {
-        socket.close();
+      // 언마운트 시 socketRef.current가 있으면 닫는다.
+      if (socketRef.current) {
+        socketRef.current.close();
       }
     };
-  }, [userId, retryCount, socket]);
+  }, [userId, retryCount]); // socket 미포함
 
   // 알림 처리 함수
   const handleNotification = async (response) => {
@@ -103,7 +95,7 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   return (
-    <WebSocketContext.Provider value={{ socket, message, setMessage, notification, handleNotification }}>
+    <WebSocketContext.Provider value={{ socket: socketRef.current, message, setMessage, notification, handleNotification }}>
       {children}
     </WebSocketContext.Provider>
   );
