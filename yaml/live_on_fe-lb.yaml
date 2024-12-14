@@ -4,6 +4,8 @@ metadata:
   name: live-on-fe
   labels:
     app: live-on-fe
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
 spec:
   ports:
   - protocol: TCP
