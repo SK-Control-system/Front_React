@@ -19,6 +19,7 @@ const BroadcastCard = ({
   currentDate,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  
 
   return (
     <Link to={`/analytics/${currentDate}/${videoId}`} className="live-broadcast-card-link">
@@ -114,6 +115,7 @@ const LiveBroadcastPage = () => {
     // 세션스토리지에서 userId 가져오기
     return sessionStorage.getItem("userId") || null;
   });
+  const [liveVideos, setLiveVideos] = useState([]);
   
   useEffect(() => {
     const fetchSubscribedChannels = async () => {
@@ -131,6 +133,62 @@ const LiveBroadcastPage = () => {
       }
     };
 
+    const fetchGetSubChannelId = async () => {
+      try {
+        const params = new URLSearchParams({ userId });
+        const url = `${process.env.REACT_APP_BACKEND_POD_URL}/api/sub/channel/card?${params.toString()}`;
+    
+        console.log("API 호출 URL:", url); // URL 로그 확인
+    
+        const response = await axios.post(url);
+    
+        console.log("서버 응답:", response.data);
+    
+        const channelIds = response.data;
+    
+        if (!channelIds || channelIds.length === 0) {
+          throw new Error("서버에서 채널 ID를 가져오지 못했습니다.");
+        }
+    
+        setSubscribedChannels(channelIds);
+        fetchLiveVideos(channelIds); // 유튜브 API 호출
+      } catch (err) {
+        console.error("구독 채널 불러오기 실패:", err);
+        setError("구독 채널을 불러오는 중 오류가 발생했습니다.");
+        setLoading(false);
+      }
+    };
+    
+    
+
+    const fetchLiveVideos = async (channelIds) => {
+      try {
+        const apiKey = "AIzaSyAk61e0vXHzb_d8kIegfJpsUUY6YXD8oV4";
+        const youtubeAPIBase = "https://www.googleapis.com/youtube/v3/search";
+
+        console.log("채널 IDs:", channelIds);
+
+        // 여러 채널의 실시간 데이터를 병렬로 요청
+        const requests = channelIds.map((channelId) => {
+          const url = `${youtubeAPIBase}?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`;
+          return axios.get(url);
+        });
+
+        const responses = await Promise.all(requests);
+        const videos = responses
+          .map((res) => res.data.items)
+          .flat(); // 여러 API 응답 결과를 합쳐서 단일 배열로
+
+        setLiveVideos(videos);
+        setLoading(false);
+      } catch (err) {
+        console.error("유튜브 실시간 방송 불러오기 실패:", err);
+        setError("실시간 방송을 불러오는 중 오류가 발생했습니다.");
+        setLoading(false);
+      }
+    };
+
+    
     const fetchBroadcastData = async () => {
       try {
         const response = await axios.get(
@@ -165,10 +223,12 @@ const LiveBroadcastPage = () => {
         setLoading(false);
       }
     };
-
-    fetchSubscribedChannels();
-    fetchBroadcastData();
-  }, []);
+    if (userId) {
+      fetchSubscribedChannels();
+      fetchBroadcastData();
+      fetchGetSubChannelId(); // 추가된 함수 호출
+    }
+  }, [userId]);
 
   const toggleSubscriptionModal = () => {
     setShowSubscriptionModal(!showSubscriptionModal);
@@ -181,42 +241,68 @@ const LiveBroadcastPage = () => {
       scrollElement.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
+  
+  
 
+  
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="live-broadcast-page">
-      {/* 구독 채널 섹션 */}
-      <div className="live-broadcast-category-section">
-        <h2 className="live-broadcast-category-title">내 구독 목록</h2>
-        <div className="live-broadcast-list-container">
-          <button
-            className="scroll-button left"
-            onClick={() => scroll("내 구독 목록", "left")}
-          >
-            ◀
-          </button>
-          <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
-            {subscribedChannels.map((channel, idx) => (
-              <BroadcastCard
-                key={idx}
-                videoTitle={channel.channelName}
-                channelTitle={channel.channelName}
-                videoThumbnailUrl={channel.channelThumbnailUrl}
-                channelThumbnailUrl={channel.channelThumbnailUrl}
-              />
-            ))}
-            <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
-          </div>
-          <button
-            className="scroll-button right"
-            onClick={() => scroll("내 구독 목록", "right")}
-          >
-            ▶
-          </button>
-        </div>
+  {/* 구독 채널 섹션 */}
+  <div className="live-broadcast-category-section">
+    <h2 className="live-broadcast-category-title">내 구독 목록</h2>
+    <div className="live-broadcast-list-container">
+      <button
+        className="scroll-button left"
+        onClick={() => scroll("내 구독 목록", "left")}
+      >
+        ◀
+      </button>
+
+      <div
+        className="live-broadcast-list"
+        ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}
+      >
+        {liveVideos.length > 0 ? (
+          liveVideos.map((video, idx) => (
+            <BroadcastCard
+              key={idx}
+              videoId={video.id.videoId}
+              videoTitle={video.snippet.title}
+              channelTitle={video.snippet.channelTitle}
+              videoThumbnailUrl={video.snippet.thumbnails.high.url}
+              channelThumbnailUrl={video.snippet.thumbnails.default.url}
+              actualStartTime={video.snippet.publishedAt}
+              currentDate={video.snippet.publishedAt.split("T")[0]}
+              stats={{
+                likes: 0, // 좋아요 수는 필요시 다른 API로 가져올 수 있음
+                comments: 0,
+                positiveReactions: "N/A",
+                averageViewTime: "N/A",
+              }}
+            />
+          ))
+        ) : (
+          <p style={{ color: "#aaa", textAlign: "center" }}>
+            실시간 방송 중인 채널이 없습니다.
+          </p>
+        )}
+
+        {/* 채널 추가하기 버튼 */}
+        <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
       </div>
+
+      <button
+        className="scroll-button right"
+        onClick={() => scroll("내 구독 목록", "right")}
+      >
+        ▶
+      </button>
+    </div>
+  </div>
+
 
       {/* 기존 카테고리별 방송 목록 */}
       {Object.keys(groupedData).map((category, index) => (
