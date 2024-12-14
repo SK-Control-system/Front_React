@@ -1,0 +1,33 @@
+.kjh-channel-container {
+  margin-top: 20px; /* 상단 여백 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 가운데 정렬 */
+  gap: 20px;
+  color: #ffffff;
+}
+
+.video-select-container {
+  width: 100%;
+  max-width: 400px; /* 드롭다운 최대 너비 */
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.video-select-container h2 {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.video-select-container select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #2e2e2e;
+  color: #fff;
+  box-sizing: border-box;
+}

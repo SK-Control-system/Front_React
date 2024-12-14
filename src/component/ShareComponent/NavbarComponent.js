@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import Subscription from './Subscription';
 import { useUser } from '../../provider/UserContext';
 import "./NavbarComponent.css";
+import LiveBroadcastPage from '../page/LiveBroadcastPage';
+import ChannelAnalyticsPage from '../channel/ChannelAnalyticsPage';
 
 function NavbarComponent() {
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -61,6 +63,7 @@ function NavbarComponent() {
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/livebroadcast">라이브 방송목록</Nav.Link>
                         <Nav.Link as={Link} to="/channel">채널 통계</Nav.Link>
+                        <Nav.Link as={Link} to="/kjhTest">ShareComponent.kjh통계페이지 TEST</Nav.Link>
                     </Nav>
 
                     <div className="auth-buttons">

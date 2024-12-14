@@ -12,6 +12,7 @@ import axios from "axios";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
 import OAuth2RedirectHandler from "./redirection/OAuth2RedirectHandler";
 import NotificationPopup from "./provider/NotificationPopup";
+import KjhChannelPage from "./component/channel/kjhChannelPage";
 
 function App() {
   const [viewerData, setViewerData] = useState([]);
@@ -63,6 +64,9 @@ function App() {
             />
             <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
             <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
+
+            {/* 김재형 채널 통계 */}
+            <Route path="/kjhTest" element={<KjhChannelPage />} />
           </Routes>
         </Router>
       </div>
