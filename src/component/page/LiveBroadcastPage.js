@@ -13,7 +13,7 @@ const BroadcastCard = ({
   videoThumbnailUrl,
   channelThumbnailUrl,
   actualStartTime,
-  stats,
+  stats = {}, // 기본값 설정
   videoId,
   currentDate,
 }) => {
@@ -93,6 +93,35 @@ const BroadcastCard = ({
   );
 };
 
+// 개별 구독 컴포넌트트
+const LiveBroadcastCard = ({ data }) => {
+  return (
+    <div className="live-broadcast-card subscribe-card">
+      <div className="subscribe-card-header">
+        <img
+          className="subscribe-card-thumbnail"
+          src={data.channelThumbnailUrl}
+          alt={`${data.channelTitle} 프로필`}
+        />
+        <div className="subscribe-card-info">
+          <h3 className="subscribe-card-title">
+            {data.channelTitle} <span className="verified-badge">✔</span>
+          </h3>
+          <p className="subscribe-card-subscriber">
+            구독자 {data.channelSubscriberCount}명
+          </p>
+        </div>
+      </div>
+      <p className="subscribe-card-description">{data.channelDescription}</p>
+      <div className="subscribe-card-buttons">
+        <button className="subscribe-card-button">방송 통계 보기</button>
+        <button className="subscribe-card-button">채널 통계 보기</button>
+      </div>
+    </div>
+  );
+};
+
+//구독 추가하는 버튼있는카드드
 const SubscribeChannelCard = ({ onAddChannel }) => {
   return (
     <div
@@ -129,16 +158,32 @@ const LiveBroadcastPage = () => {
   const [error, setError] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scrollRefs = useRef({});
+  const [channelData, setChannelData] = useState([]);
 
   useEffect(() => {
-    const fetchSubscribedChannels = async () => {
+    const fetchData = async () => {
+      const userId = sessionStorage.getItem("userId");
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_POD_URL}/api/subscribed-channels`
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/sub/channelId?userId=${userId}`
         );
-        setSubscribedChannels(response.data);
-      } catch (err) {
-        console.error("구독 채널 데이터 불러오기 실패:", err);
+        const rawData = await response.json();
+  
+        // JSON 파싱 및 유효한 데이터 필터링
+        const parsedData = rawData
+          .map((item) => {
+            try {
+              return JSON.parse(item); // JSON 문자열을 객체로 파싱
+            } catch (e) {
+              console.error("JSON 파싱 에러:", e);
+              return null; // 파싱 실패 시 null 반환
+            }
+          })
+          .filter((item) => item && Object.keys(item).length > 0); // 유효한 객체만 필터링
+  
+        setChannelData(parsedData);
+      } catch (error) {
+        console.error("Error fetching channel data:", error);
       }
     };
 
@@ -177,7 +222,7 @@ const LiveBroadcastPage = () => {
       }
     };
 
-    fetchSubscribedChannels();
+    fetchData();
     fetchBroadcastData();
   }, []);
 
@@ -196,6 +241,7 @@ const LiveBroadcastPage = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
+
   return (
     <div className="live-broadcast-page">
       {/* 구독 채널 섹션 */}
@@ -209,16 +255,16 @@ const LiveBroadcastPage = () => {
             ◀
           </button>
           <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
-            {subscribedChannels.map((channel, idx) => (
-              <BroadcastCard
-                key={idx}
-                videoTitle={channel.channelName}
-                channelTitle={channel.channelName}
-                videoThumbnailUrl={channel.channelThumbnailUrl}
-                channelThumbnailUrl={channel.channelThumbnailUrl}
-              />
-            ))}
-            <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
+
+          {channelData.length > 0 ? (
+              channelData.map((data, index) => (
+                <LiveBroadcastCard key={index} data={data} />
+              ))
+            ) : (
+              <p>데이터를 불러오는 중...</p>
+            )}
+            
+          <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
           </div>
           <button
             className="scroll-button right"
