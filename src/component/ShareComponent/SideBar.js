@@ -19,19 +19,19 @@ const SideBar = () => {
         <li>
           <Link to="/">
             <FaHome />
-            <span className="menu-text">대시보드</span>
-          </Link>
-        </li>
-        <li>
-          <Link to="/content">
-            <FaFileAlt />
-            <span className="menu-text">콘텐츠</span>
+            <span className="menu-text">홈</span>
           </Link>
         </li>
         <li>
           <Link to="/analytics">
+            <FaFileAlt />
+            <span className="menu-text">실시간 내 방송</span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/channel">
             <FaChartBar />
-            <span className="menu-text">분석</span>
+            <span className="menu-text">채널 통계</span>
           </Link>
         </li>
         <li>

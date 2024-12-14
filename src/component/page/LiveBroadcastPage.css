@@ -329,3 +329,99 @@
 .scroll-button:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+
+/* 구독 카드 전체 */
+.subscribe-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  color: white;
+  width: 320px;
+}
+
+/* 헤더 섹션: 썸네일과 텍스트 정보 */
+.subscribe-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 채널 썸네일 이미지 */
+.subscribe-card-thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+}
+
+/* 텍스트 정보 그룹 */
+.subscribe-card-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 채널 이름 */
+.subscribe-card-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 인증 뱃지 */
+.verified-badge {
+  font-size: 14px;
+  color: #4caf50;
+}
+
+/* 구독자 수 */
+.subscribe-card-subscriber {
+  font-size: 14px;
+  color: #9a9a9a;
+  margin: 0;
+}
+
+/* 채널 설명 */
+.subscribe-card-description {
+  font-size: 14px;
+  color: #cccccc;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 구독 카드 버튼 컨테이너 */
+.subscribe-card-buttons {
+  display: flex;
+  flex-direction: column; /* 세로 방향으로 배치 */
+  gap: 12px; /* 버튼 간격 */
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* 구독 카드 버튼 */
+.subscribe-card-button {
+  width: 100%; /* 버튼이 카드의 전체 너비를 차지 */
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #444;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s ease;
+}
+
+.subscribe-card-button:hover {
+  background: #666;
+}

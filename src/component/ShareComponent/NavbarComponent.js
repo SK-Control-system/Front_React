@@ -66,10 +66,6 @@ function NavbarComponent() {
                     <div className="auth-buttons">
                         {userId ? (
                             <div className="sub-buttons">
-                                <button className="sub-btn" onClick={toggleSubscriptionModal}>
-                                    구독 추가
-                                </button>
-
                                 <button className="auth-btn logout-btn" onClick={handleLogout}>
                                     로그아웃
                                 </button>
