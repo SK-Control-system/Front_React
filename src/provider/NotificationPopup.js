@@ -1,5 +1,5 @@
 import React from "react";
-import { useWebSocket } from "./websocketContext";
+import { useWebSocket } from "./WebSocketContext";
 
 const NotificationPopup = () => {
   const { notification, handleNotification } = useWebSocket();
