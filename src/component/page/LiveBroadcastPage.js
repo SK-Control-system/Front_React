@@ -218,6 +218,29 @@ const LiveBroadcastPage = () => {
                 channelThumbnailUrl={channel.channelThumbnailUrl}
               />
             ))}
+            <div className="live-broadcast-card subscribe-card">
+          <div className="subscribe-card-header">
+            <img
+              className="subscribe-card-thumbnail"
+              src="https://yt3.ggpht.com/jFTTC8trQ5NMxZFVCLRi5bcotL5D6oSdD-hX9a0Io8_Hmbsi7F6RW5O7pad3m_sFORGguXFu_gM=s800-c-k-c0x00ffffff-no-rj"
+              alt="이렐킹 IRELKING 프로필"
+            />
+            <div className="subscribe-card-info">
+              <h3 className="subscribe-card-title">이렐킹 IRELKING <span className="verified-badge">✔</span></h3>
+              <p className="subscribe-card-subscriber">구독자 30.8만명</p>
+            </div>
+          </div>
+          <p className="subscribe-card-description">
+            챌린저 이렐리아 장인 이렐킹 유튜브 채널입니다.
+          </p>
+          <div className="subscribe-card-buttons">
+            <button className="subscribe-card-button">방송 통계 보기</button>
+            <button className="subscribe-card-button">채널 통계 보기</button>
+          </div>
+        </div>
+
+
+            
             <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
           </div>
           <button

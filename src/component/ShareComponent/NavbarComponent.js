@@ -35,8 +35,8 @@ function NavbarComponent() {
 
         sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
         console.log(sessionStorage.getItem('loginRedirectUrl'));
-        window.location.href = `${process.env.REACT_APP_API_POD_URL}/googleLogin`;
-        console.log(`로그인버튼작동 , '${process.env.REACT_APP_API_POD_URL}'`);
+        window.location.href = 'http://localhost:8080/login';
+        console.log(`로그인버튼작동 , 'localhost:8080'`);
     };
 
     const handleLogout = () => {
@@ -66,10 +66,6 @@ function NavbarComponent() {
                     <div className="auth-buttons">
                         {userId ? (
                             <div className="sub-buttons">
-                                <button className="sub-btn" onClick={toggleSubscriptionModal}>
-                                    구독 추가
-                                </button>
-
                                 <button className="auth-btn logout-btn" onClick={handleLogout}>
                                     로그아웃
                                 </button>
