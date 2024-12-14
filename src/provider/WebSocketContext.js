@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useUser } from "./UserContext";
 import { parseStringPromise } from "xml2js"; // XML 파싱을 위한 라이브러리
-import axios from "axios"; // API 요청을 위한 라이브러리
 
 // WebSocket Context 생성
 const WebSocketContext = createContext(null);
