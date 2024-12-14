@@ -9,6 +9,7 @@ export const WebSocketProvider = ({ children }) => {
 
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState(null); // 백엔드에서 온 메시지 저장
+  const [retryCount, setRetryCount] = useState(0); // 재연결 시도 횟수
 
   useEffect(() => {
     if (!userId) {
@@ -17,45 +18,60 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     // WebSocket 연결
-    const ws = new WebSocket(
-      `wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
-    );
+    const connectWebSocket = () => {
+      const ws = new WebSocket(
+        `wss://${process.env.REACT_APP_WEBSOCKET_URL}/ws/notifications?userId=${userId}`
+      );
 
-    ws.onopen = () => console.log("WebSocket connected");
-    
-    // 에러 핸들러 추가
-    ws.onerror = (error) => {
-      console.error("WebSocket 연결 에러:", error);
-    };
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+        setRetryCount(0); // 연결 성공 시 재시도 횟수 초기화
+      };
 
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("Message from server:", data);
+      // 에러 핸들러 추가
+      ws.onerror = (error) => {
+        console.error("WebSocket 연결 에러:", error);
+      };
 
-        if (data.type === "alert") {
-          setMessage(data.message);
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Message from server:", data);
+
+          if (data.type === "alert") {
+            setMessage(data.message);
+          }
+        } catch (error) {
+          console.error("WebSocket 메시지 처리 중 에러:", error);
         }
-      } catch (error) {
-        console.error("WebSocket 메시지 처리 중 에러:", error);
-      }
+      };
+
+      ws.onclose = (event) => {
+        if (event.wasClean) {
+          console.log(`WebSocket 연결 정상 종료 (코드: ${event.code}, 사유: ${event.reason})`);
+        } else {
+          console.error("WebSocket 연결이 비정상적으로 종료됨");
+          // 재연결 시도
+          const retryInterval = Math.min(1000 * 2 ** retryCount, 35000); // 재연결 간격 증가 (최대 35초)
+          setTimeout(() => {
+            setRetryCount((prev) => prev + 1);
+            connectWebSocket();
+          }, retryInterval);
+        }
+      };
+
+      setSocket(ws);
     };
 
-    ws.onclose = (event) => {
-      if (event.wasClean) {
-        console.log(`WebSocket 연결 정상 종료 (코드: ${event.code}, 사유: ${event.reason})`);
-      } else {
-        console.error("WebSocket 연결이 비정상적으로 종료됨");
-      }
-    };
-
-    setSocket(ws);
+    connectWebSocket();
 
     // 컴포넌트 언마운트 시 WebSocket 닫기
     return () => {
-      ws.close();
+      if (socket) {
+        socket.close();
+      }
     };
-  }, [userId]);
+  }, [userId, retryCount, socket]);
 
   return (
     <WebSocketContext.Provider value={{ socket, message, setMessage }}>
