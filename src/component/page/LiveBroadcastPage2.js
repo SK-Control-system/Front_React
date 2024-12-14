@@ -19,13 +19,12 @@ const BroadcastCard = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // 방송 시작 시간부터 현재까지의 시간 계산
   const calculateBroadcastDuration = (startTime) => {
     if (!startTime) return "시간 정보 없음";
 
     const start = new Date(startTime);
     const now = new Date();
-    const diff = now - start; // 밀리초 단위
+    const diff = now - start;
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -60,7 +59,6 @@ const BroadcastCard = ({
             <span className="live-broadcast-category">{category}</span>
           </div>
           <div className="live-broadcast-card-content">
-            {/* 채널 썸네일이 있는 경우에만 표시 */}
             {channelThumbnailUrl && (
               <img
                 className="live-broadcast-channel-profile"
@@ -93,59 +91,29 @@ const BroadcastCard = ({
   );
 };
 
-// 개별 구독 컴포넌트트
-const LiveBroadcastCard = ({ data }) => {
+const SubscribeChannelCard = ({ channelData }) => {
+  const { channelTitle, channelThumbnailUrl, channelSubscriberCount, channelDescription } = channelData;
+
   return (
     <div className="live-broadcast-card subscribe-card">
+      
       <div className="subscribe-card-header">
         <img
           className="subscribe-card-thumbnail"
-          src={data.channelThumbnailUrl}
-          alt={`${data.channelTitle} 프로필`}
+          src={channelThumbnailUrl || "https://via.placeholder.com/120"}
+          alt={`${channelTitle} 프로필`}
         />
         <div className="subscribe-card-info">
           <h3 className="subscribe-card-title">
-            {data.channelTitle} <span className="verified-badge">✔</span>
+            {channelTitle} <span className="verified-badge">✔</span>
           </h3>
-          <p className="subscribe-card-subscriber">
-            구독자 {data.channelSubscriberCount}명
-          </p>
+          <p className="subscribe-card-subscriber">구독자 {channelSubscriberCount || 0}명</p>
         </div>
       </div>
-      <p className="subscribe-card-description">{data.channelDescription}</p>
+      <p className="subscribe-card-description">{channelDescription || "채널 설명이 없습니다."}</p>
       <div className="subscribe-card-buttons">
         <button className="subscribe-card-button">방송 통계 보기</button>
         <button className="subscribe-card-button">채널 통계 보기</button>
-      </div>
-    </div>
-  );
-};
-
-//구독 추가하는 버튼있는카드드
-const SubscribeChannelCard = ({ onAddChannel }) => {
-  return (
-    <div
-      className="live-broadcast-card subscribe-channel-card"
-      onClick={onAddChannel}
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        cursor: "pointer",
-      }}
-    >
-      <div
-        style={{
-          textAlign: "center",
-          color: "#9a9a9a",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        <PlusCircle size={48} color="#ffffff" />
-        <span style={{ fontSize: "14px" }}>채널 추가하기</span>
       </div>
     </div>
   );
@@ -158,32 +126,26 @@ const LiveBroadcastPage = () => {
   const [error, setError] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scrollRefs = useRef({});
-  const [channelData, setChannelData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSubscribedChannels = async () => {
       const userId = sessionStorage.getItem("userId");
       try {
-        const response = await fetch(
-          `http://k8s-default-livecont-5d9ce644e3-3d81eacc511da4ad.elb.us-east-1.amazonaws.com:8888/api/redis/get/hash/sub/channelId?userId=${userId}`
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/sub/channelId?userId=${userId}`
         );
-        const rawData = await response.json();
-  
-        // JSON 파싱 및 유효한 데이터 필터링
-        const parsedData = rawData
+        const parsedChannels = response.data
           .map((item) => {
             try {
-              return JSON.parse(item); // JSON 문자열을 객체로 파싱
-            } catch (e) {
-              console.error("JSON 파싱 에러:", e);
-              return null; // 파싱 실패 시 null 반환
+              return JSON.parse(item);
+            } catch {
+              return null;
             }
           })
-          .filter((item) => item && Object.keys(item).length > 0); // 유효한 객체만 필터링
-  
-        setChannelData(parsedData);
-      } catch (error) {
-        console.error("Error fetching channel data:", error);
+          .filter((channel) => channel && channel.channelId);
+        setSubscribedChannels(parsedChannels);
+      } catch (err) {
+        console.error("구독 채널 데이터 불러오기 실패:", err);
       }
     };
 
@@ -197,15 +159,12 @@ const LiveBroadcastPage = () => {
         const rawData = Object.values(response.data).map((item) => {
           try {
             return JSON.parse(item);
-          } catch (e) {
-            console.error("JSON 파싱 에러:", e);
+          } catch {
             return {};
           }
         });
 
-        // video.category가 'n'인 경우 필터링
-        const validData = rawData.filter((video) => video.videoId && (video.category !== 'n'));
-
+        const validData = rawData.filter((video) => video.videoId && video.category !== "n");
         const grouped = validData.reduce((acc, video) => {
           const category = video.category || "기타";
           if (!acc[category]) acc[category] = [];
@@ -222,74 +181,31 @@ const LiveBroadcastPage = () => {
       }
     };
 
-    fetchData();
+    fetchSubscribedChannels();
     fetchBroadcastData();
   }, []);
-
-  const toggleSubscriptionModal = () => {
-    setShowSubscriptionModal(!showSubscriptionModal);
-  };
-
-  const scroll = (category, direction) => {
-    const scrollElement = scrollRefs.current[category];
-    if (scrollElement) {
-      const scrollAmount = direction === "left" ? -600 : 600;
-      scrollElement.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
-
   return (
     <div className="live-broadcast-page">
-      {/* 구독 채널 섹션 */}
       <div className="live-broadcast-category-section">
         <h2 className="live-broadcast-category-title">내 구독 목록</h2>
         <div className="live-broadcast-list-container">
-          <button
-            className="scroll-button left"
-            onClick={() => scroll("내 구독 목록", "left")}
-          >
-            ◀
-          </button>
-          <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
-
-          {channelData.length > 0 ? (
-              channelData.map((data, index) => (
-                <LiveBroadcastCard key={index} data={data} />
-              ))
-            ) : (
-              <p>데이터를 불러오는 중...</p>
-            )}
-            
-          <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
+          <div className="live-broadcast-list">
+            {subscribedChannels.map((channel, idx) => (
+              <SubscribeChannelCard key={idx} channelData={channel} />
+            ))}
           </div>
-          <button
-            className="scroll-button right"
-            onClick={() => scroll("내 구독 목록", "right")}
-          >
-            ▶
-          </button>
         </div>
       </div>
 
-      {/* 기존 카테고리별 방송 목록 */}
       {Object.keys(groupedData).map((category, index) => (
         <div key={index} className="live-broadcast-category-section">
           <h2 className="live-broadcast-category-title">{category}</h2>
           <div className="live-broadcast-list-container">
-            <button
-              className="scroll-button left"
-              onClick={() => scroll(category, "left")}
-            >
-              ◀
-            </button>
-            <div
-              className="live-broadcast-list"
-              ref={(el) => (scrollRefs.current[category] = el)}
-            >
+            <div className="live-broadcast-list" ref={(el) => (scrollRefs.current[category] = el)}>
               {groupedData[category].map((broadcast, idx) => {
                 const currentDate = broadcast.videoAPIReceivedTime
                   ? broadcast.videoAPIReceivedTime.split(" ")[0]
@@ -317,23 +233,9 @@ const LiveBroadcastPage = () => {
                 );
               })}
             </div>
-            <button
-              className="scroll-button right"
-              onClick={() => scroll(category, "right")}
-            >
-              ▶
-            </button>
           </div>
         </div>
       ))}
-
-      {/* Subscription Modal */}
-      {showSubscriptionModal && (
-        <Subscription
-          show={showSubscriptionModal}
-          onHide={toggleSubscriptionModal}
-        />
-      )}
     </div>
   );
 };
