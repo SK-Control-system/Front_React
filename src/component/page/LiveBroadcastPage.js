@@ -82,7 +82,6 @@ const BroadcastCard = ({
             <h4 className="text-stats-title">실시간 방송 통계</h4>
             <ul className="text-stats-list">
               <li>❤️ 좋아요: {stats.likes || 0}개</li>
-              <li>💬 댓글: {stats.comments || 0}개</li>
               <li>😀 긍정 반응: {stats.positiveReactions || "80%"}</li>
               <li>⌛ 방송 진행 시간: {broadcastDuration}</li>
             </ul>
@@ -95,6 +94,27 @@ const BroadcastCard = ({
 
 // 개별 구독 컴포넌트트
 const LiveBroadcastCard = ({ data }) => {
+  const handleViewStatistics = async () => {
+    const youtubeApiKey = process.env.REACT_APP_YOUTUBE_API_KEY;
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${data.channelId}&eventType=live&type=video&key=${youtubeApiKey}`
+      );
+
+      if (response.data.items && response.data.items.length > 0) {
+        const video = response.data.items[0]; // 첫 번째 방송 데이터
+        const videoId = video.id.videoId;
+        const currentDate = new Date().toLocaleDateString("en-CA"); // 현재 날짜 (YYYY-MM-DD)
+        window.location.href = `/analytics/${currentDate}/${videoId}`; // 방송 페이지로 이동
+      } else {
+        alert("현재 이 채널에서 진행 중인 방송이 없습니다.");
+      }
+    } catch (error) {
+      console.error("YouTube API 요청 실패:", error);
+      alert("방송 데이터를 가져오는 중 문제가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="live-broadcast-card subscribe-card">
       <div className="subscribe-card-header">
@@ -114,7 +134,9 @@ const LiveBroadcastCard = ({ data }) => {
       </div>
       <p className="subscribe-card-description">{data.channelDescription}</p>
       <div className="subscribe-card-buttons">
-        <button className="subscribe-card-button">방송 통계 보기</button>
+        <button className="subscribe-card-button" onClick={handleViewStatistics}>
+          방송 통계 보기
+        </button>
         <button className="subscribe-card-button">채널 통계 보기</button>
       </div>
     </div>
@@ -165,7 +187,7 @@ const LiveBroadcastPage = () => {
       const userId = sessionStorage.getItem("userId");
       try {
         const response = await fetch(
-          `http://k8s-default-livecont-5d9ce644e3-3d81eacc511da4ad.elb.us-east-1.amazonaws.com:8888/api/redis/get/hash/sub/channelId?userId=${userId}`
+           `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/sub/channelId?userId=${userId}` 
         );
         const rawData = await response.json();
   

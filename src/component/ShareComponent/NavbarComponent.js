@@ -35,7 +35,7 @@ function NavbarComponent() {
 
         sessionStorage.setItem('loginRedirectUrl', window.location.pathname + window.location.search);
         console.log(sessionStorage.getItem('loginRedirectUrl'));
-        window.location.href = 'http://localhost:8080/login';
+        window.location.href = 'http://localhost:8080/googleLogin';
         console.log(`로그인버튼작동 , 'localhost:8080'`);
     };
 
