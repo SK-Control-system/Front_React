@@ -5,6 +5,7 @@ import EmotionTrendChart from "../analytics/EmotionTrendChart";
 import ChatBox from "../analytics/ChatBox";
 import { useParams } from "react-router-dom";
 import useSSE from "../../hook/UseSSE";
+import BroadcastProfile from "./BroadcastProfile"
 
 const AnalyticsPage = () => {
   const [emotionData, setEmotionData] = useState([]);
@@ -176,18 +177,8 @@ const AnalyticsPage = () => {
   return (
     <div className="analytics-container">
       <div className="좌측">
-        <div className="chatsearch">
-          <input
-            type="text"
-            placeholder="채팅 검색..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="chat-search"
-          />
-          <p>총 채팅 수: {totalChatCount}</p> {/* 총 갯수 표시 */}
-        </div>
-
-        <ChatBox chatData={filteredChatData} />
+        <BroadcastProfile videoId={videoId} currentDate={currentDate} />
+        <ChatBox chatData={chatData} />
       </div>
       <div className="우측">
         <EmotionTrendChart data={emotionData} currentDate={currentDate} videoId={videoId} />
