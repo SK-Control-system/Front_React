@@ -85,7 +85,7 @@ function BroadcastRanking() {
       rank.category.toLowerCase().includes(lowercasedTerm)
     );
     setFilteredRankings(filtered);
-    setCurrentPage(1); // 검색 시 첫 페이지로 리셋
+    setCurrentPage(1); 
   }, [searchTerm, rankings]);
 
   const totalPages = Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
@@ -123,7 +123,7 @@ function BroadcastRanking() {
           <input
             type="text"
             className="search-input"
-            placeholder="Search for anything..."
+            placeholder="Search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
