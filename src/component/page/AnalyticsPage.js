@@ -178,7 +178,6 @@ const AnalyticsPage = () => {
     <div className="analytics-container">
       <div className="좌측">
         <BroadcastProfile videoId={videoId} currentDate={currentDate} />
-        <p className="mt-4 mb-4">총 채팅 수: {totalChatCount}</p>
         <ChatBox chatData={chatData} />
       </div>
       <div className="우측">
