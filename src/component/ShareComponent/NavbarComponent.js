@@ -61,7 +61,7 @@ function NavbarComponent() {
                     <Navbar.Brand as={Link} to="/"><img
                         src={logo}
                         alt="라온"
-                        className="h-8 w-auto" // Tailwind 클래스: 높이 설정 및 자동 너비
+                        className="h-11 w-auto"
                         /></Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/livebroadcast">라이브 방송목록</Nav.Link>
