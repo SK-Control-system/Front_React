@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Subscription from './Subscription';
 import { useUser } from '../../provider/UserContext';
 import "./NavbarComponent.css";
+import logo from '../../static/Live On Your YouTube.svg'; 
 
 function NavbarComponent() {
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -57,7 +58,11 @@ function NavbarComponent() {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <Navbar.Brand as={Link} to="/">라온</Navbar.Brand>
+                    <Navbar.Brand as={Link} to="/"><img
+                        src={logo}
+                        alt="라온"
+                        className="h-8 w-auto" // Tailwind 클래스: 높이 설정 및 자동 너비
+                        /></Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/livebroadcast">라이브 방송목록</Nav.Link>
                         <Nav.Link as={Link} to="/channel">채널 통계</Nav.Link>
