@@ -1,3 +1,4 @@
+// ViewerReactionChart.js
 import React, { useEffect, useState } from "react";
 import { Doughnut, PolarArea } from "react-chartjs-2";
 import {
@@ -9,6 +10,7 @@ import {
 } from "chart.js";
 import axios from "axios";
 import "./ViewerReactionChart.css";
+import { FaSmile, FaHeartBroken } from "react-icons/fa"; // 아이콘 추가
 
 // Chart.js에 필요한 모듈 등록
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale);
@@ -28,6 +30,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
     anger: 0,
     disgust: 0,
     surprise: 0,
+    confusion: 0, // 혼란 추가
   });
 
   const [loading, setLoading] = useState(true);
@@ -37,13 +40,13 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
     const fetchSentimentAndEmotionData = async () => {
       try {
         setLoading(true);
-  
+
         // 긍/부정 데이터 요청
         const sentimentResponse = await axios.post(
           `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/chatting/search/sentiment?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
-  
-        const sentiments = sentimentResponse.data || []; // 응답이 없을 경우 빈 배열로 처리
+
+        const sentiments = sentimentResponse.data || [];
         const sentimentCounts = {
           veryPositive: 0,
           positive: 0,
@@ -51,7 +54,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           negative: 0,
           veryNegative: 0,
         };
-  
+
         if (sentiments.length > 0) {
           sentiments.forEach((sentiment) => {
             switch (sentiment) {
@@ -69,12 +72,12 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
                 break;
               case "매우 부정":
                 sentimentCounts.veryNegative += 1;
-                break; 
+                break;
               default:
                 break;
             }
           });
-  
+
           const totalSentiments = sentiments.length || 1;
           setDoughnutStats({
             veryPositive: (sentimentCounts.veryPositive / totalSentiments).toFixed(2),
@@ -82,26 +85,24 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
             neutral: (sentimentCounts.neutral / totalSentiments).toFixed(2),
             negative: (sentimentCounts.negative / totalSentiments).toFixed(2),
             veryNegative: (sentimentCounts.veryNegative / totalSentiments).toFixed(2),
-            
           });
         }
-  
+
         // 감성 분석 데이터 요청
         const emotionResponse = await axios.post(
           `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/chatting/search/emotion?index=chatting_youtube_${currentDate}&videoid=${videoId}`
         );
-  
-        const emotions = emotionResponse.data || []; // 배열 형태의 감정 데이터
-  
+
+        const emotions = emotionResponse.data || [];
         const emotionCounts = {
           joy: 0,
           sadness: 0,
           anger: 0,
           disgust: 0,
           surprise: 0,
-          confusion: 0, // 혼란 추가
+          confusion: 0,
         };
-        
+
         if (emotions.length > 0) {
           emotions.forEach((emotion) => {
             switch (emotion) {
@@ -121,17 +122,17 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
                 emotionCounts.surprise += 1;
                 break;
               case "혼란":
-                emotionCounts.confusion += 1; // 혼란 처리
+                emotionCounts.confusion += 1;
                 break;
               default:
                 console.warn("알 수 없는 감정 데이터:", emotion);
                 break;
             }
           });
-        
+
           setEmotionStats(emotionCounts);
         }
-  
+
         setLoading(false);
       } catch (err) {
         console.error("데이터 가져오기 실패:", err);
@@ -139,7 +140,7 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
         setLoading(false);
       }
     };
-  
+
     fetchSentimentAndEmotionData();
   }, [currentDate, videoId]);
 
@@ -156,30 +157,60 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           doughnutStats.veryNegative,
         ],
         backgroundColor: [
-          "#22C55E", // Green
-          "#3B82F6", // Blue
-          "#EAB308", // Yellow
-          "#F97316", // Orange
-          "#EF4444", // Red
+          "#4ADE80", // 매우 긍정
+          "#2DD4BF", // 긍정
+          "#FBBF24", // 중립
+          "#FB7185", // 부정
+          "#F43F5E", // 매우 부정
         ],
-        borderWidth: 1,
+        borderWidth: 0,
+        borderRadius: 5,
+        spacing: 3,
       },
     ],
   };
 
   const doughnutOptions = {
     responsive: true,
+    maintainAspectRatio: false,
+    cutout: '65%',
     plugins: {
       legend: {
         position: "bottom",
+        align: "center",
         labels: {
-          color: "#FFFFFF",
-        },
+          color: "#9CA3AF",
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 20,
+          font: {
+            size: 12,
+            family: "'Pretendard', sans-serif",
+          }
+        }
       },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        padding: 12,
+        titleFont: {
+          size: 13,
+          family: "'Pretendard', sans-serif",
+        },
+        bodyFont: {
+          size: 12,
+          family: "'Pretendard', sans-serif",
+        },
+        cornerRadius: 8,
+        callbacks: {
+          label: function(context) {
+            return ` ${context.label}: ${(context.raw * 100).toFixed(1)}%`;
+          }
+        }
+      }
     },
   };
 
-  // PolarArea Chart 데이터
+  // Polar Area Chart 데이터
   const polarAreaData = {
     labels: ["기쁨", "슬픔", "분노", "혐오", "놀람", "혼란"],
     datasets: [
@@ -190,57 +221,97 @@ const ViewerReactionChart = ({ currentDate, videoId }) => {
           emotionStats.anger,
           emotionStats.disgust,
           emotionStats.surprise,
-          emotionStats.confusion, // 혼란 추가
+          emotionStats.confusion,
         ],
         backgroundColor: [
-          "#3B82F6", // Blue
-          "#22C55E", // Green
-          "#EAB308", // Yellow
-          "#F97316", // Orange
-          "#EF4444", // Red
-          "#9CA3AF", // Gray for 혼란
+          "#60A5FA", // 기쁨
+          "#34D399", // 슬픔
+          "#FBBF24", // 분노
+          "#F87171", // 혐오
+          "#A78BFA", // 놀람
+          "#9CA3AF", // 혼란
         ],
-        borderWidth: 1,
+        borderWidth: 0,
       },
     ],
   };
 
   const polarAreaOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom",
+        align: "center",
         labels: {
-          color: "#FFFFFF",
-        },
+          color: "#9CA3AF",
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 20,
+          font: {
+            size: 12,
+            family: "'Pretendard', sans-serif",
+          }
+        }
       },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        padding: 12,
+        titleFont: {
+          size: 13,
+          family: "'Pretendard', sans-serif",
+        },
+        bodyFont: {
+          size: 12,
+          family: "'Pretendard', sans-serif",
+        },
+        cornerRadius: 8,
+      }
     },
     scales: {
       r: {
         ticks: {
-          color: "#FFFFFF",
+          color: "#9CA3AF",
+          backdropColor: "transparent",
+          font: {
+            size: 11,
+          }
         },
         grid: {
-          color: "rgba(255, 255, 255, 0.1)",
+          color: "rgba(255, 255, 255, 0.06)",
         },
+        angleLines: {
+          color: "rgba(255, 255, 255, 0.06)",
+        }
       },
     },
   };
 
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <div className="mx-12 p-4 text-gray-400">로딩 중...</div>;
+  if (error) return <div className="mx-12 p-4 text-red-400">{error}</div>;
 
   return (
-    <div className="emotion-statistics-container">
-      {/* 시청자 긍/부정 통계 */}
-      <div className="emotion-statistics">
-        <h3 className="sentiment-title">시청자의 긍/부정 통계</h3>
-        <Doughnut data={doughnutData} options={doughnutOptions} />
-      </div>
-      {/* 시청자 감성 통계 */}
-      <div className="emotion-statistics">
-        <h3 className="emotion-title">시청자의 감성 통계</h3>
-        <PolarArea data={polarAreaData} options={polarAreaOptions} />
+    <div className="mx-12 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 긍/부정 통계 그래프 */}
+        <div className="bg-sentiment rounded-lg p-6 shadow-lg">
+          <h3 className="flex items-center text-lg font-medium text-white mb-6">
+            <FaHeartBroken className="mr-2" /> 시청자의 긍/부정 통계
+          </h3>
+          <div className="h-[300px]">
+            <Doughnut data={doughnutData} options={doughnutOptions} />
+          </div>
+        </div>
+
+        {/* 감성 통계 그래프 */}
+        <div className="bg-emotion rounded-lg p-6 shadow-xl">
+          <h3 className="flex items-center text-lg font-medium text-white mb-6">
+            <FaSmile className="mr-2" /> 시청자의 감성 통계
+          </h3>
+          <div className="h-[300px]">
+            <PolarArea data={polarAreaData} options={polarAreaOptions} />
+          </div>
+        </div>
       </div>
     </div>
   );

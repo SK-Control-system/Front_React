@@ -1,55 +1,57 @@
 import React, { useState } from "react";
-import "./Tabs.css"; // CSS 파일
-import ViewerReactionChart from "./ViewerReactionChart"; // ViewerReactionChart 컴포넌트
-import WordCloudComponent from "./WordCloudComponent"; // WordCloud 컴포넌트
+import ViewerReactionChart from "./ViewerReactionChart";
+import WordCloudComponent from "./WordCloudComponent";
 import LikesAndComments from "./LikesAndComments";
-
-// 탭 내용에 표시될 컴포넌트들
+import { BarChart2, MessageSquare, ThumbsUp } from 'lucide-react';
 
 const Tabs = ({ currentDate, videoId }) => {
   const [activeTab, setActiveTab] = useState("viewerReaction");
-  console.log("currentDate:", currentDate, "videoId:", videoId);
 
-  // 탭에 따른 콘텐츠 렌더링
-  const renderContent = () => {
-    switch (activeTab) {
-      case "viewerReaction":
-        return <ViewerReactionChart currentDate={currentDate} videoId={videoId} />;
-      case "keywordStats":
-        return <WordCloudComponent currentDate={currentDate} videoId={videoId} />; // WordCloud 컴포넌트 연결
-      case "likesAndComments":
-        return <LikesAndComments currentDate={currentDate} videoId={videoId} />;
-      default:
-        return null;
+  const tabs = [
+    {
+      id: "viewerReaction",
+      label: "시청자 반응",
+      icon: <BarChart2 size={16} />,
+      component: <ViewerReactionChart currentDate={currentDate} videoId={videoId} />
+    },
+    {
+      id: "keywordStats",
+      label: "키워드",
+      icon: <MessageSquare size={16} />,
+      component: <WordCloudComponent currentDate={currentDate} videoId={videoId} />
+    },
+    {
+      id: "likesAndComments",
+      label: "좋아요 수",
+      icon: <ThumbsUp size={16} />,
+      component: <LikesAndComments currentDate={currentDate} videoId={videoId} />
     }
-  };
+  ];
 
   return (
-    <div className="binance-tabs">
-      {/* 탭 버튼 */}
-      <div className="tab-buttons">
-        <div
-          className={`tab ${activeTab === "viewerReaction" ? "active" : ""}`}
-          onClick={() => setActiveTab("viewerReaction")}
-        >
-          시청자 반응
-        </div>
-        <div
-          className={`tab ${activeTab === "keywordStats" ? "active" : ""}`}
-          onClick={() => setActiveTab("keywordStats")}
-        >
-          키워드
-        </div>
-        <div
-          className={`tab ${activeTab === "likesAndComments" ? "active" : ""}`}
-          onClick={() => setActiveTab("likesAndComments")}
-        >
-          좋아요 수
+    <div className="mx-16 mb-20 bg-custom-gray rounded-lg p-4 mt-4">
+      <div className="flex items-center gap-4 mb-4 px-2">
+        <div className="flex gap-2">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
-
-      {/* 탭 내용 */}
-      <div className="tab-content">{renderContent()}</div>
+      
+      <div className="mt-4">
+        {tabs.find(tab => tab.id === activeTab)?.component}
+      </div>
     </div>
   );
 };

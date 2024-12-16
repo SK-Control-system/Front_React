@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
-import "../analytics/EmotionTrendChart.css";
-import "../../App.css";
+import axios from "axios";
+import { BarChart2, Users } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +12,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -25,30 +24,17 @@ ChartJS.register(
 );
 
 const EmotionTrendChart = ({ data, currentDate, videoId }) => {
-  const [selectedChart, setSelectedChart] = useState("emotionTrend"); // 기본값: 감정 트렌드
-  const [dropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 열림 상태
-  const [viewerData, setViewerData] = useState({ labels: [], data: [] }); // 시청자 수 데이터
+  const [selectedChart, setSelectedChart] = useState("emotionTrend");
+  const [viewerData, setViewerData] = useState({ labels: [], data: [] });
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev); // 드롭다운 열림/닫힘 토글
-  };
-
-  const handleChartChange = (chart) => {
-    setSelectedChart(chart); // 선택한 차트로 변경
-    setDropdownOpen(false); // 드롭다운 닫기
-  };
-
-  // 시간 데이터를 HH:mm 형식으로 변환
   const formatTime = (time) => {
     return new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  // 데이터 그룹화
   const groupDataByMinute = (data) => {
     const groupedData = {};
-
     data.forEach((item) => {
-      const time = formatTime(item.time); // HH:mm 형식으로 변환
+      const time = formatTime(item.time);
       if (!groupedData[time]) {
         groupedData[time] = {
           time,
@@ -65,11 +51,9 @@ const EmotionTrendChart = ({ data, currentDate, videoId }) => {
       groupedData[time].negative += item.negative;
       groupedData[time].veryNegative += item.veryNegative;
     });
-
     return Object.values(groupedData);
   };
 
-  // 그룹화된 데이터
   const groupedData = groupDataByMinute(data);
 
   const emotionTrendData = {
@@ -78,80 +62,71 @@ const EmotionTrendChart = ({ data, currentDate, videoId }) => {
       {
         label: "매우 긍정",
         data: groupedData.map((item) => item.veryPositive),
-        borderColor: "#2E7D32",
-        backgroundColor: "rgba(46, 125, 50, 0.2)",
+        borderColor: "#4ADE80",
+        backgroundColor: "rgba(74, 222, 128, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
       {
         label: "긍정",
         data: groupedData.map((item) => item.positive),
-        borderColor: "#4CAF50",
-        backgroundColor: "rgba(76, 175, 80, 0.2)",
+        borderColor: "#2DD4BF",
+        backgroundColor: "rgba(45, 212, 191, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
       {
         label: "중립",
         data: groupedData.map((item) => item.neutral),
-        borderColor: "#FFD700",
-        backgroundColor: "rgba(255, 215, 0, 0.2)",
+        borderColor: "#FBBF24",
+        backgroundColor: "rgba(251, 191, 36, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
       {
         label: "부정",
         data: groupedData.map((item) => item.negative),
-        borderColor: "#F44336",
-        backgroundColor: "rgba(244, 67, 54, 0.2)",
+        borderColor: "#FB7185",
+        backgroundColor: "rgba(251, 113, 133, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
       {
         label: "매우 부정",
         data: groupedData.map((item) => item.veryNegative),
-        borderColor: "#B71C1C",
-        backgroundColor: "rgba(183, 28, 28, 0.2)",
+        borderColor: "#F43F5E",
+        backgroundColor: "rgba(244, 63, 94, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
     ],
   };
 
-  // 시청자 수 데이터 가져오기
   useEffect(() => {
     const fetchViewerData = async () => {
       try {
-        // 시간 데이터 가져오기
-        const timeResponse = await axios.post(
-          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`
-        );
+        const [timeResponse, viewerResponse] = await Promise.all([
+          axios.post(
+            `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewersWithTime?index=video_youtube_${currentDate}&videoid=${videoId}`
+          ),
+          axios.post(
+            `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewers?index=video_youtube_${currentDate}&videoid=${videoId}`
+          )
+        ]);
 
-        // 시청자 수 데이터 가져오기
-        const viewerResponse = await axios.post(
-          `${process.env.REACT_APP_BACKEND_POD_URL}/api/es/video/search/concurrentViewers?index=video_youtube_${currentDate}&videoid=${videoId}`
-        );
-
-        // 시간 데이터와 시청자 수 데이터 매칭
-        const timestamps = timeResponse.data;
-        const viewers = viewerResponse.data;
-
-        // 시간 데이터가 더 많은 경우 마지막 데이터 유지
-        const minLength = Math.min(timestamps.length, viewers.length);
-        const trimmedTimestamps = timestamps.slice(0, minLength);
-        const trimmedViewers = viewers.slice(0, minLength);
-
-        // 시간 포맷 변환
-        const formattedTimestamps = trimmedTimestamps.map((time) => formatTime(time));
+        const minLength = Math.min(timeResponse.data.length, viewerResponse.data.length);
+        const formattedTimestamps = timeResponse.data
+          .slice(0, minLength)
+          .map(formatTime);
 
         setViewerData({
           labels: formattedTimestamps,
-          data: trimmedViewers,
+          data: viewerResponse.data.slice(0, minLength),
         });
       } catch (error) {
         console.error("시청자 수 데이터 가져오기 실패:", error);
@@ -167,11 +142,11 @@ const EmotionTrendChart = ({ data, currentDate, videoId }) => {
       {
         label: "실시간 시청자 수",
         data: viewerData.data,
-        borderColor: "#FF5733",
-        backgroundColor: "rgba(255, 87, 51, 0.2)",
+        borderColor: "#60A5FA",
+        backgroundColor: "rgba(96, 165, 250, 0.3)",
         borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
       },
     ],
   };
@@ -179,54 +154,96 @@ const EmotionTrendChart = ({ data, currentDate, videoId }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 800,
-      easing: "easeInOutQuad",
+    interaction: {
+      mode: 'index',
+      intersect: false,
     },
     plugins: {
       legend: {
         position: "top",
+        align: "start",
         labels: {
           color: "#FFFFFF",
-        },
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 12,
+            family: "'Pretendard', sans-serif",
+          }
+        }
       },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: {
+          size: 13,
+          family: "'Pretendard', sans-serif",
+        },
+        bodyFont: {
+          size: 12,
+          family: "'Pretendard', sans-serif",
+        },
+        padding: 12,
+        cornerRadius: 8,
+      }
     },
     scales: {
       x: {
-        ticks: { color: "#FFFFFF" },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
+        grid: {
+          color: "rgba(255, 255, 255, 0.06)",
+        },
+        ticks: {
+          color: "#9CA3AF",
+          font: {
+            size: 11,
+            family: "'Pretendard', sans-serif",
+          }
+        }
       },
       y: {
-        ticks: { color: "#FFFFFF" },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
-      },
-    },
+        grid: {
+          color: "rgba(255, 255, 255, 0.06)",
+        },
+        ticks: {
+          color: "#9CA3AF",
+          font: {
+            size: 11,
+            family: "'Pretendard', sans-serif",
+          }
+        }
+      }
+    }
   };
 
   return (
-    <div className="chart-container">
-      <div className="chart-header">
-        <div className="filter">
-          <span onClick={toggleDropdown}>
-            {selectedChart === "emotionTrend" ? "감정 트렌드 ▼" : "시청자 수 ▼"}
-          </span>
-          <div className={`dropdown ${dropdownOpen ? "open" : ""}`}>
-            <div
-              className="dropdown-item"
-              onClick={() => handleChartChange("emotionTrend")}
-            >
-              <span className="dropdown-icon"></span> 감정 트렌드
-            </div>
-            <div
-              className="dropdown-item"
-              onClick={() => handleChartChange("viewerChart")}
-            >
-              <span className="dropdown-icon"></span>시청자 수 
-            </div>
-          </div>
+    <div className="mx-16 mb-12 bg-custom-gray rounded-lg p-4">
+      <div className="flex items-center gap-4 mb-4 px-2">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSelectedChart("emotionTrend")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              selectedChart === "emotionTrend"
+                ? "bg-blue-500 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            <BarChart2 size={16} />
+            감정 트렌드
+          </button>
+          <button
+            onClick={() => setSelectedChart("viewerChart")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              selectedChart === "viewerChart"
+                ? "bg-blue-500 text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            <Users size={16} />
+            시청자 수
+          </button>
         </div>
       </div>
-      <div className="chart">
+      
+      <div className="h-[360px] p-2">
         <Line
           data={selectedChart === "emotionTrend" ? emotionTrendData : viewerChartData}
           options={options}
