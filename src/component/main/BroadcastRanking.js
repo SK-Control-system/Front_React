@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./BroadcastRanking.css";
-import { Link } from "react-router-dom"; // React Router의 Link 컴포넌트 추가
+import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
 
 const fallbackData = [
   "{}",
   "{\"channelPublishedAt\":\"'n'\",\"videoId\":\"pEi2lBrLt3g\",\"actualStartTime\":\"2024-12-05 04:08:30\",\"channelThumbnailUrl\":\"'n'\",\"viewCount\":\"327025\",\"channelDescription\":\"'n'\",\"likeCount\":\"10869\",\"videoTitle\":\"‘재형이의 썸씽\",\"channelAPIReceivedTime\":\"'n'\",\"categoryAPIReceivedTime\":\"2024-12-06 15:35:47\",\"category\":\"game\",\"channelSubscriberCount\":\"'n'\",\"channelId\":\"UCF5Wkdo3inmxP-Y59wXDsFw\",\"videoAPIReceivedTime\":\"2024-12-06 15:36:50\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/YPTxG3t53FU/hqdefault_live.jpg\",\"concurrentViewers\":\"6937\",\"channelTitle\":\"재형이당\",\"actualEndTime\":\"'n'\",\"channelViewCount\":\"'n'\"}",
-  "{\"channelPublishedAt\":\"'n'\",\"videoId\":\"pEi2lBrLt3g\",\"actualStartTime\":\"2024-12-05 01:04:30\",\"channelThumbnailUrl\":\"'n'\",\"viewCount\":\"987025\",\"channelDescription\":\"'n'\",\"likeCount\":\"15869\",\"videoTitle\":\"‘비상계엄사태 관련 긴급 현안질의’ 국회 국방위원회 전체회의 - [끝까지LIVE] MBC 중계방송 2024년 12월 05일\",\"channelAPIReceivedTime\":\"'n'\",\"categoryAPIReceivedTime\":\"2024-12-06 15:35:47\",\"category\":\"정치\",\"channelSubscriberCount\":\"'n'\",\"channelId\":\"UCF4Wxdo3inmxP-Y59wXDsFw\",\"videoAPIReceivedTime\":\"2024-12-06 15:36:50\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/YPTxG3t53FU/hqdefault_live.jpg\",\"concurrentViewers\":\"36954\",\"channelTitle\":\"MBCNEWS\",\"actualEndTime\":\"'n'\",\"channelViewCount\":\"'n'\"}",
-  "{\"channelPublishedAt\":\"'n'\",\"videoId\":\"pEi2lBrLt3g\",\"actualStartTime\":\"2024-12-05 04:08:30\",\"channelThumbnailUrl\":\"'n'\",\"viewCount\":\"327025\",\"channelDescription\":\"'n'\",\"likeCount\":\"12169\",\"videoTitle\":\"째니의 개인방송\",\"channelAPIReceivedTime\":\"'n'\",\"categoryAPIReceivedTime\":\"2024-12-06 15:35:47\",\"category\":\"정치\",\"channelSubscriberCount\":\"'n'\",\"channelId\":\"UCF5Wkdo3inmxP-Y59wXDsFw\",\"videoAPIReceivedTime\":\"2024-12-06 15:36:50\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/YPTxG3t53FU/hqdefault_live.jpg\",\"concurrentViewers\":\"2837\",\"channelTitle\":\"째니\",\"actualEndTime\":\"'n'\",\"channelViewCount\":\"'n'\"}",
-  "{\"channelPublishedAt\":\"'n'\",\"videoId\":\"pEi2lBrLt3g\",\"actualStartTime\":\"2024-12-05 04:08:30\",\"channelThumbnailUrl\":\"'n'\",\"viewCount\":\"327025\",\"channelDescription\":\"'n'\",\"likeCount\":\"9969\",\"videoTitle\":\"석훈이의일상\",\"channelAPIReceivedTime\":\"'n'\",\"categoryAPIReceivedTime\":\"2024-12-06 15:35:47\",\"category\":\"game\",\"channelSubscriberCount\":\"'n'\",\"channelId\":\"UCF5Wkdo3inmxP-Y59wXDsFw\",\"videoAPIReceivedTime\":\"2024-12-06 15:36:50\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/YPTxG3t53FU/hqdefault_live.jpg\",\"concurrentViewers\":\"19937\",\"channelTitle\":\"석훈이당\",\"actualEndTime\":\"'n'\",\"channelViewCount\":\"'n'\"}",
-  "{\"channelPublishedAt\":\"'n'\",\"videoId\":\"pEi2lBrLt3g\",\"actualStartTime\":\"2024-12-05 04:08:30\",\"channelThumbnailUrl\":\"'n'\",\"viewCount\":\"327025\",\"channelDescription\":\"'n'\",\"likeCount\":\"9969\",\"videoTitle\":\"롤악귀\",\"channelAPIReceivedTime\":\"'n'\",\"categoryAPIReceivedTime\":\"2024-12-06 15:35:47\",\"category\":\"영화\",\"channelSubscriberCount\":\"'n'\",\"channelId\":\"UCF5Wkdo3inmxP-Y59wXDsFw\",\"videoAPIReceivedTime\":\"2024-12-06 15:36:50\",\"videoThumbnailUrl\":\"https://i.ytimg.com/vi/YPTxG3t53FU/hqdefault_live.jpg\",\"concurrentViewers\":\"23937\",\"channelTitle\":\"욱진이의롤방송\",\"actualEndTime\":\"'n'\",\"channelViewCount\":\"'n'\"}",
-  "{}",
-  "{}",
-  "{}",
-  "{}",
+  // ... (나머지 fallbackData)
 ];
 
 function BroadcastRanking() {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -110,7 +104,11 @@ function BroadcastRanking() {
         </thead>
         <tbody>
           {rankings.map((rank, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              className="ranking-row"
+              onClick={() => navigate(`/analytics/${rank.currentDate}/${rank.videoId}`)}
+            >
               <td className="rank-column">#{index + 1}</td>
               <td>
                 <div className="profile">
@@ -125,11 +123,7 @@ function BroadcastRanking() {
                   {rank.name}
                 </div>
               </td>
-              <td>
-                <Link to={`/analytics/${rank.currentDate}/${rank.videoId}`}>
-                  {rank.title}
-                </Link>
-              </td>
+              <td>{rank.title}</td>
               <td>{rank.viewers.toLocaleString()}명</td>
               <td>
                 {rank.category !== 'n' && (
