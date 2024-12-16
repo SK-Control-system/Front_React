@@ -34,9 +34,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      # .env 파일 생성
+      - name: Create .env file
+        run: |
+          echo "REACT_APP_YOUTUBE_API_KEY=${{ secrets.REACT_APP_YOUTUBE_API_KEY }}" > .env
+
       - name: Build React Application
         run: |
-          export REACT_APP_YOUTUBE_API_KEY=${{ secrets.REACT_APP_YOUTUBE_API_KEY }}
           CI=false npm run build
 
       - name: Set up Docker Buildx

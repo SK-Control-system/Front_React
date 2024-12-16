@@ -195,7 +195,7 @@ const LiveBroadcastPage = () => {
       const userId = sessionStorage.getItem("userId");
       try {
         const response = await fetch(
-           `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/sub/channelId?userId=${userId}` 
+          `${process.env.REACT_APP_BACKEND_POD_URL}/api/redis/get/hash/sub/channelId?userId=${userId}`
         );
         const rawData = await response.json();
   

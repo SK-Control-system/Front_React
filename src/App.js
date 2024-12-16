@@ -11,6 +11,7 @@ import "./App.css";
 import axios from "axios";
 import LiveBroadcastPage from "./component/page/LiveBroadcastPage";
 import OAuth2RedirectHandler from "./redirection/OAuth2RedirectHandler";
+import NotificationPopup from "./provider/NotificationPopup";
 
 function App() {
   const [viewerData, setViewerData] = useState([]);
@@ -42,28 +43,29 @@ function App() {
     return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 해제
   }, []);
 
-
-
   return (
     <WebSocketProvider>
-      <Router>
-        <NavbarComponent />
-        <SideBar />
-        <Routes>
-          <Route
-            path="/"
-            element={<MainPage viewerData={viewerData} />}
-          />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
-          <Route
-            path="/livebroadcast"
-            element={<LiveBroadcastPage viewerData={viewerData} />}
-          />
-          <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
-          <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
-        </Routes>
-      </Router>
+      <div>
+        <NotificationPopup/>
+        <Router>
+          <NavbarComponent />
+          <SideBar />
+          <Routes>
+            <Route
+              path="/"
+              element={<MainPage viewerData={viewerData} />}
+            />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/analytics/:currentDate/:videoId" element={<AnalyticsPage />} />
+            <Route
+              path="/livebroadcast"
+              element={<LiveBroadcastPage viewerData={viewerData} />}
+            />
+            <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+            <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
+          </Routes>
+        </Router>
+      </div>
     </WebSocketProvider>
   );
 }
