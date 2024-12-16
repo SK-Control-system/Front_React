@@ -165,7 +165,6 @@ const ChannelAnalyticsPage = () => {
                 </div>
               </div>
             </section>
-
             <section className="viewer-graph">
               <h2>조회수 추이</h2>
               <div className="graph">
