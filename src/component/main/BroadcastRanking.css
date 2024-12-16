@@ -1,3 +1,5 @@
+/* BroadcastRanking.css */
+
 .broadcast-ranking {
   width: 100%;
   background: #303030;
@@ -6,7 +8,31 @@
   color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 20px auto;
+  transition: background 0.3s ease;
+}
+
+.broadcast-ranking.loading,
+.broadcast-ranking.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #5c5ce0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .ranking-header {
@@ -18,9 +44,10 @@
 
 .ranking-header h2 {
   font-family: "NanumSquare Neo OTF", sans-serif;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #ffffff;
+  margin: 0;
 }
 
 .ranking-controls {
@@ -38,6 +65,7 @@
   color: #303030;
   background: #f5f5f5;
   width: 200px;
+  transition: width 0.3s ease, opacity 0.3s ease;
 }
 
 .search-button {
@@ -47,6 +75,14 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.search-button:hover {
+  background: #4545d1;
 }
 
 .date-filter {
@@ -58,6 +94,11 @@
   gap: 8px;
   color: #ddd;
   cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.date-filter:hover {
+  background: #555;
 }
 
 .ranking-table {
@@ -67,7 +108,7 @@
 
 .ranking-table th,
 .ranking-table td {
-  padding: 12px;
+  padding: 12px 16px;
   text-align: left;
   font-family: "NanumSquare Neo OTF", sans-serif;
 }
@@ -76,6 +117,7 @@
   font-weight: 700;
   font-size: 16px;
   color: #ccc;
+  border-bottom: 2px solid #444;
 }
 
 .ranking-table tr:nth-child(odd) {
@@ -97,6 +139,11 @@
   transform: translateY(-2px); /* 약간 위로 이동 */
 }
 
+.ranking-row:focus {
+  outline: none;
+  background-color: #555555;
+}
+
 /* Profile 스타일 */
 .profile {
   display: flex;
@@ -108,8 +155,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background-color: #ccc;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
 }
 
+/* Category Badge 스타일 */
 .category-badge {
   display: inline-block;
   padding: 4px 8px;
@@ -118,4 +170,115 @@
   color: #303030;
   font-size: 14px;
   font-weight: 700;
+  position: relative;
+  cursor: default;
+}
+
+.category-badge:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #555;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.category-badge::after {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #555;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* No Results 스타일 */
+.no-results {
+  text-align: center;
+  padding: 20px;
+  color: #bbb;
+}
+
+/* Pagination 스타일 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 8px;
+}
+
+.page-button {
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.page-button:hover {
+  background: #555;
+}
+
+.page-button.active {
+  background: #5c5ce0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .broadcast-ranking {
+    padding: 16px;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .ranking-header h2 {
+    font-size: 22px;
+  }
+
+  .search-input {
+    width: 150px;
+  }
+
+  .ranking-table th,
+  .ranking-table td {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .profile-circle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .category-badge {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .page-button {
+    padding: 6px 10px;
+  }
 }
