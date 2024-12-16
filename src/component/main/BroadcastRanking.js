@@ -9,11 +9,17 @@ const fallbackData = [
   // ... (나머지 fallbackData)
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 function BroadcastRanking() {
   const [rankings, setRankings] = useState([]);
+  const [filteredRankings, setFilteredRankings] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // useNavigate 훅 사용
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -39,6 +45,7 @@ function BroadcastRanking() {
           }));
 
         setRankings(sortedRankings);
+        setFilteredRankings(sortedRankings);
       } catch (err) {
         console.error("API 요청 실패:", err);
         setError("API 요청 실패");
@@ -61,6 +68,7 @@ function BroadcastRanking() {
           }));
 
         setRankings(fallbackRankings);
+        setFilteredRankings(fallbackRankings);
       } finally {
         setLoading(false);
       }
@@ -69,8 +77,42 @@ function BroadcastRanking() {
     fetchRankings();
   }, []);
 
+  useEffect(() => {
+    const lowercasedTerm = searchTerm.toLowerCase();
+    const filtered = rankings.filter((rank) =>
+      rank.title.toLowerCase().includes(lowercasedTerm) ||
+      rank.name.toLowerCase().includes(lowercasedTerm) ||
+      rank.category.toLowerCase().includes(lowercasedTerm)
+    );
+    setFilteredRankings(filtered);
+    setCurrentPage(1); // 검색 시 첫 페이지로 리셋
+  }, [searchTerm, rankings]);
+
+  const totalPages = Math.ceil(filteredRankings.length / ITEMS_PER_PAGE);
+  const paginatedRankings = filteredRankings.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="broadcast-ranking loading">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="broadcast-ranking error">
+        <p>{error}</p>
+      </div>
+    );
   }
 
   return (
@@ -82,6 +124,8 @@ function BroadcastRanking() {
             type="text"
             className="search-input"
             placeholder="Search for anything..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button className="search-button">
             <i className="fas fa-search"></i>
@@ -103,37 +147,67 @@ function BroadcastRanking() {
           </tr>
         </thead>
         <tbody>
-          {rankings.map((rank, index) => (
-            <tr
-              key={index}
-              className="ranking-row"
-              onClick={() => navigate(`/analytics/${rank.currentDate}/${rank.videoId}`)}
-            >
-              <td className="rank-column">#{index + 1}</td>
-              <td>
-                <div className="profile">
-                  <span
-                    className="profile-circle"
-                    style={{
-                      backgroundImage: `url(${rank.profileImage})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
-                  ></span>
-                  {rank.name}
-                </div>
-              </td>
-              <td>{rank.title}</td>
-              <td>{rank.viewers.toLocaleString()}명</td>
-              <td>
-                {rank.category !== 'n' && (
-                  <span className="category-badge">{rank.category}</span>
-                )}
+          {paginatedRankings.length > 0 ? (
+            paginatedRankings.map((rank, index) => (
+              <tr
+                key={index}
+                className="ranking-row"
+                onClick={() => navigate(`/analytics/${rank.currentDate}/${rank.videoId}`)}
+                role="button"
+                tabIndex={0}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    navigate(`/analytics/${rank.currentDate}/${rank.videoId}`);
+                  }
+                }}
+              >
+                <td className="rank-column">#{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
+                <td>
+                  <div className="profile">
+                    <span
+                      className="profile-circle"
+                      style={{
+                        backgroundImage: `url(${rank.profileImage})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    ></span>
+                    {rank.name}
+                  </div>
+                </td>
+                <td>{rank.title}</td>
+                <td>{rank.viewers.toLocaleString()}명</td>
+                <td>
+                  {rank.category !== 'n' && (
+                    <span className="category-badge" data-tooltip={rank.category}>
+                      {rank.category}
+                    </span>
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="no-results">
+                검색 결과가 없습니다.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
+      {totalPages > 1 && (
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              className={`page-button ${page === currentPage ? "active" : ""}`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
