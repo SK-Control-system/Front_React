@@ -306,6 +306,57 @@
   position: relative;
 }
 
+/* LiveBroadcastPage 스타일 */
+.live-broadcast-page {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 20px;
+  font-family: 'NanumSquare Neo', sans-serif;
+  margin-left: 50px;
+}
+
+/* 카테고리 섹션 스타일 */
+.live-broadcast-category-section {
+  margin-bottom: 40px;
+  /* 높이를 명시적으로 설정하여 세로 스크롤 방지 */
+  height: auto;
+  overflow: visible;
+}
+
+.live-broadcast-category-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* 리스트 컨테이너 스타일 수정 */
+.live-broadcast-list-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  /* 높이를 카드 높이에 맞춤 */
+  height: 311px;
+  overflow: visible;
+}
+
+/* 리스트 스타일 수정 */
+.live-broadcast-list {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: hidden; /* 세로 스크롤 명시적으로 제거 */
+  height: 100%;
+  padding: 0 40px; /* 스크롤 버튼을 위한 여백 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.live-broadcast-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* 스크롤 버튼 위치 조정 */
 .scroll-button {
   background: rgba(0, 0, 0, 0.5);
   border: none;
@@ -317,13 +368,18 @@
   z-index: 2;
   top: 50%;
   transform: translateY(-50%);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .scroll-button.left {
+  left: 0;
 }
 
 .scroll-button.right {
-  right: 5px;
+  right: 0;
 }
 
 .scroll-button:hover {
