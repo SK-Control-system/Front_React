@@ -396,6 +396,15 @@
   color: #cccccc;
   line-height: 1.5;
   margin: 0;
+  /* 줄임표 처리 추가 */
+  display: -webkit-box; /* Flexbox-like behavior */
+  -webkit-line-clamp: 3; /* 최대 3줄 표시 */
+  -webkit-box-orient: vertical; /* 세로 방향 박스 */
+  overflow: hidden; /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis; /* 줄임표 추가 */
+  min-height: 60px;
+  max-height: 60px; /* 최대 높이 */
+  word-wrap: break-word; /* 단어가 길 경우 줄바꿈 */
 }
 
 /* 구독 카드 버튼 컨테이너 */
