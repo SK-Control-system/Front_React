@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation ,useNavigate} from "react-router-dom";
+import axios from "axios";
 import { 
   FaHome, 
   FaFileAlt, 
@@ -14,9 +15,34 @@ import { useUser } from "../../provider/UserContext";
 
 const SideBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { userName } = useUser(); // Google 사용자 이름 가져오기
+  const { userName, userChannelId } = useUser(); // Google 사용자 이름과 채널 ID 가져오기
   const location = useLocation(); // 현재 경로 가져오기
+  const navigate = useNavigate();
 
+  const handleAnalyticsClick = async (event) => {
+    event.preventDefault(); // 기본 링크 동작 방지
+    if (!userChannelId) {
+      alert("로그인된 사용자 채널 ID를 찾을 수 없습니다.");
+      return;
+    }
+    const youtubeApiKey = process.env.REACT_APP_YOUTUBE_API_KEY;
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${userChannelId}&eventType=live&type=video&key=${youtubeApiKey}`
+      );
+      if (response.data.items && response.data.items.length > 0) {
+        const video = response.data.items[0]; // 첫 번째 방송 데이터
+        const videoId = video.id.videoId;
+        const currentDate = new Date().toLocaleDateString("en-CA"); // 현재 날짜 (YYYY-MM-DD)
+        navigate(`/analytics/${currentDate}/${videoId}`); // 방송 페이지로 이동
+      } else {
+        alert("현재 실시간 방송이 진행 중이지 않습니다.");
+      }
+    } catch (error) {
+      console.error("YouTube API 요청 실패:", error);
+      alert("방송 데이터를 가져오는 중 문제가 발생했습니다.");
+    }
+  };
   return (
     <div
       className={`sidebar ${isExpanded ? "expanded" : "collapsed"}`}
@@ -37,9 +63,10 @@ const SideBar = () => {
         </li>
         <li>
           <Link 
-            to="/analytics" 
+            to='#'
             aria-label="실시간 내 방송" 
             className={location.pathname === "/analytics" ? "active" : ""}
+            onClick={handleAnalyticsClick} // 클릭 이벤트 연결
           >
             <FaFileAlt className="menu-icon" />
             <span className="menu-text">실시간 내 방송</span>
@@ -47,12 +74,12 @@ const SideBar = () => {
         </li>
         <li>
           <Link 
-            to="/channel" 
-            aria-label="채널 통계" 
-            className={location.pathname === "/channel" ? "active" : ""}
+            to={`/channel/${userChannelId || "default"}`} 
+            aria-label="내 채널 보기" 
+            className={location.pathname === `/channel/${userChannelId}` ? "active" : ""}
           >
             <FaChartBar className="menu-icon" />
-            <span className="menu-text">채널 통계</span>
+            <span className="menu-text">내 채널 보기</span>
           </Link>
         </li>
         <li>

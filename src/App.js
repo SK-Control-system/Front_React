@@ -61,7 +61,8 @@ function App() {
               path="/livebroadcast"
               element={<LiveBroadcastPage viewerData={viewerData} />}
             />
-            <Route path="/channel/:videoId" element={<ChannelAnalyticsPage />} />
+            <Route path="/channel/:channelId" element={<ChannelAnalyticsPage />} />
+
             <Route path="/oauth/callback/google" element={<OAuth2RedirectHandler />} />
           </Routes>
         </Router>

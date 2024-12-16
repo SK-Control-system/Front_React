@@ -114,6 +114,13 @@ const LiveBroadcastCard = ({ data }) => {
       alert("방송 데이터를 가져오는 중 문제가 발생했습니다.");
     }
   };
+
+  // 채널 통계 보기 함수
+  const handleChannelAnalytics = () => {
+    window.location.href = `/channel/${data.channelId}`;
+    console.log(`${data.channelId}`);
+
+  };
   //구독자수변환함수
   const formatSubscriberCount = (count) => {
     if (count >= 10000) {
@@ -145,7 +152,7 @@ const LiveBroadcastCard = ({ data }) => {
         <button className="subscribe-card-button" onClick={handleViewStatistics}>
           방송 통계 보기
         </button>
-        <button className="subscribe-card-button">채널 통계 보기</button>
+        <button className="subscribe-card-button"onClick={handleChannelAnalytics}>채널 통계 보기</button>
       </div>
     </div>
   );
