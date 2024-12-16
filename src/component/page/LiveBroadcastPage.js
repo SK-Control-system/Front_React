@@ -114,7 +114,15 @@ const LiveBroadcastCard = ({ data }) => {
       alert("방송 데이터를 가져오는 중 문제가 발생했습니다.");
     }
   };
-
+  //구독자수변환함수
+  const formatSubscriberCount = (count) => {
+    if (count >= 10000) {
+      return `${(count / 10000).toFixed(2).replace(/\.?0+$/, "")}만명`; // 만 단위
+    } else if (count >= 1000) {
+      return `${(count / 1000).toFixed(2).replace(/\.?0+$/, "")}천명`; // 천 단위
+    }
+    return `${count}명`; // 1000명 미만 그대로 출력
+  };
   return (
     <div className="live-broadcast-card subscribe-card">
       <div className="subscribe-card-header">
@@ -128,7 +136,7 @@ const LiveBroadcastCard = ({ data }) => {
             {data.channelTitle} <span className="verified-badge">✔</span>
           </h3>
           <p className="subscribe-card-subscriber">
-            구독자 {data.channelSubscriberCount}명
+            구독자 {formatSubscriberCount(data.channelSubscriberCount)}
           </p>
         </div>
       </div>

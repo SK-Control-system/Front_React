@@ -9,24 +9,28 @@ import "./NavbarComponent.css";
 
 function NavbarComponent() {
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-    const { userId, setUserId, setUserName, setToken } = useUser();
+    const { userId, setUserId, userChannelId, setUserChannelId, token, setToken, userName, setUserName} = useUser();
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const userId = params.get("userId");
         const userName = decodeURIComponent(params.get("userName")); // URL 디코딩
         const token = params.get("accessToken");
+        const userChannelId = params.get("userChannelId");
 
         if (userId && userName && token) { // 모든 값이 있을 때만 실행
             setUserId(userId);
             setUserName(userName);
             setToken(token);
+            setUserChannelId(userChannelId);
 
             sessionStorage.setItem("userId", userId);
             sessionStorage.setItem("userName", userName);
             sessionStorage.setItem("token", token);
+            sessionStorage.setItem("userChannelId", userChannelId);
+
         }
-    }, [setUserId, setUserName, setToken]);
+    }, [setUserId, setUserName, setToken, setUserChannelId]);
 
     const handleGoogleLogin = async () => {
         sessionStorage.removeItem("userId");

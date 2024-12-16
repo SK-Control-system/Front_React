@@ -92,7 +92,7 @@ function StatisticsPanel() {
       <div className="card card2">
         <div className="card-header">전체 조회 수</div>
         <div className="card-row">
-          <div className="card-content">{stats.totalViewCount.toLocaleString()} 명</div>
+          <div className="card-content">{stats.totalViewCount.toLocaleString()} 회</div>
           {/* <div className="card-percentage negative">
             -0.03% <span className="arrow">⬇</span>
           </div> */}
