@@ -286,13 +286,10 @@ const LiveBroadcastPage = () => {
           </button>
           <div className="live-broadcast-list" ref={(el) => (scrollRefs.current["내 구독 목록"] = el)}>
 
-          {channelData.length > 0 ? (
-              channelData.map((data, index) => (
-                <LiveBroadcastCard key={index} data={data} />
-              ))
-            ) : (
-              <p>데이터를 불러오는 중...</p>
-            )}
+          {channelData.map((data, index) => (
+              <LiveBroadcastCard key={index} data={data} />
+            ))}
+
             
           <SubscribeChannelCard onAddChannel={toggleSubscriptionModal} />
           </div>

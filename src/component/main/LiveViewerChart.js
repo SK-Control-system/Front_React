@@ -59,7 +59,7 @@ function LiveViewerChart({ viewerData }) {
 
   return (
     <div className="chart-container">
-      <h2>1분 단위 총 시청자 수</h2>
+      <h2>전체 시청자 수 추이</h2>
       <div className="chart">
         <Line data={chartData} options={options} />
       </div>
