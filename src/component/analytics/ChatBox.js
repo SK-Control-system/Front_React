@@ -22,7 +22,7 @@ const ChatBox = ({ chatData }) => {
   return (
     <div className="chat-box">
       <h2 className="chat-header">실시간 채팅창</h2>
-      <div className="chat-messages" ref={chatBoxRef} style={{ overflowY: "auto", maxHeight: "400px" }}>
+      <div className="chat-messages" ref={chatBoxRef} style={{ overflowY: "auto", maxHeight: "calc(100vh - 50px)" }}>
         {chatData.map((chat) => (
           <div
             key={`${chat.chatterChannelId}_${chat.chatTime}_${Math.random()}`}
