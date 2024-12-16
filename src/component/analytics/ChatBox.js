@@ -61,6 +61,7 @@ const ChatBox = ({ chatData }) => {
       <div 
         className="chat-messages" 
         ref={chatBoxRef}
+        style={{ overflowY: "auto", maxHeight: "calc(100vh - 20px)"}}
       >
         {filteredChats.map((chat) => (
           <div
