@@ -1,8 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Search } from "lucide-react";
 import "./ChatBox.css";
 
 const ChatBox = ({ chatData }) => {
-  const chatBoxRef = useRef(null); // 채팅창 요소에 접근하기 위한 Ref 생성
+  const chatBoxRef = useRef(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredChats, setFilteredChats] = useState(chatData);
 
   const sentimentColors = {
     "매우 긍정": "#4caf50",
@@ -13,17 +17,52 @@ const ChatBox = ({ chatData }) => {
   };
 
   useEffect(() => {
-    // 새로운 채팅이 추가될 때마다 스크롤을 최하단으로 이동
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
-  }, [chatData]); // chatData가 변경될 때마다 실행
+  }, [chatData]);
+
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredChats(chatData);
+    } else {
+      const filtered = chatData.filter((chat) =>
+        chat.message.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredChats(filtered);
+    }
+  }, [searchQuery, chatData]);
 
   return (
     <div className="chat-box">
-      <h2 className="chat-header">실시간 채팅창</h2>
-      <div className="chat-messages" ref={chatBoxRef} style={{ overflowY: "auto", maxHeight: "calc(100vh - 50px)" }}>
-        {chatData.map((chat) => (
+      <div className="chat-header-container">
+        <h2 className="chat-header">실시간 채팅창</h2>
+        <button
+          className="search-toggle-btn"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+        >
+          <Search size={20} color="white" />
+        </button>
+      </div>
+
+      <div className={`search-modal ${isSearchOpen ? 'open' : ''}`}>
+        <input
+          type="text"
+          placeholder="채팅 검색..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <p className="search-results">
+          검색결과: {filteredChats.length}개 / 전체: {chatData.length}개
+        </p>
+      </div>
+
+      <div 
+        className="chat-messages" 
+        ref={chatBoxRef}
+      >
+        {filteredChats.map((chat) => (
           <div
             key={`${chat.chatterChannelId}_${chat.chatTime}_${Math.random()}`}
             className="chat-message"
@@ -40,17 +79,14 @@ const ChatBox = ({ chatData }) => {
             />
             <div className="chat-content">
               <div className="chat-info">
-                <strong className="chat-user">
-                  {chat.chatterName}
-                </strong>
+                <strong className="chat-user">{chat.chatterName}</strong>
               </div>
               <p className="chat-text">{chat.message}</p>
             </div>
             <span
               className="chat-sentiment"
               style={{
-                backgroundColor:
-                  sentimentColors[chat.sentiment.label] || "#000",
+                backgroundColor: sentimentColors[chat.sentiment.label] || "#000",
               }}
             >
               {chat.sentiment.label}
